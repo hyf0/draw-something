@@ -1,0 +1,22 @@
+.view-game {
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  .view-game-main {
+    flex: 1;
+    .player-list {
+      display: flex;
+      flex-flow: row wrap;
+      .player-list-item {
+        flex: 0 0 25%;
+        display: flex;
+        justify-content: center;
+      }
+    }
+    .game-message-list {
+      padding: 20px;
+      height: 50px;
+      overflow-y: scroll;
+    }
+  }
+}

@@ -1,12 +1,39 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+// import { HashRouter } from 'react-router-dom';
+import { Provider, useDispatch } from 'react-redux';
+import { ConnectedRouter } from 'connected-react-router'
 
+import { AppRoute } from './route';
+import configureStore, { history } from '@/store'
+import { userEffects } from './store/effects';
+
+
+export const store = configureStore();
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(userEffects.startListenRefreshPlayerInfo());
+    return () => {
+      dispatch(userEffects.stopListenRefreshPlayerInfo());
+    };
+  }, [dispatch]);
+
+
   return (
     <div className="App">
-      app
+      <ConnectedRouter history={history}>
+        <AppRoute />
+      </ConnectedRouter>
     </div>
   );
 }
 
-export default App;
+const AppWrapper = () => (
+  <Provider store={store}>
+    <App />
+  </Provider>
+);
+
+export default AppWrapper;

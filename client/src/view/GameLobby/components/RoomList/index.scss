@@ -1,0 +1,45 @@
+.room-list {
+  height: 100%;
+  background-color: #fff;
+  padding: 0;
+  .no-room-text {
+    color: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    padding: 20px 0;
+    font-size: 1.5em;
+  }
+  .room-list-item-wrapper {
+    padding: 0;
+    // overflow: scroll;
+    .room-list-item {
+      flex: 1;
+      color: #fff;
+      .room-list-item-header {
+        padding: 12px;
+        font-size: 18px;
+        display: flex;
+        background-color: royalblue;
+        .room-list-item-header-titie {
+          flex: 1;
+        }
+      }
+      .room-list-item-detail {
+        padding: 12px;
+        font-size: 20px;
+        background-color: #fff;
+        color: royalblue;
+        display: flex;
+        align-items: center;
+        .number-of-player {
+          flex: 1;
+        }
+        .room-list-item-operations {
+          .join-in-button {
+            color: royalblue;
+            border-color: royalblue;
+          }
+        }
+      }
+    }
+  }
+}

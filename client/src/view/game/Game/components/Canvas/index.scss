@@ -1,0 +1,14 @@
+.game-canvas {
+  .canvas-wrapper {
+    background-color: lightgray;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    canvas {
+      // background-color: #fff;
+    }
+  }
+  .game-canvas-operations {
+    display: flex;
+  }
+}

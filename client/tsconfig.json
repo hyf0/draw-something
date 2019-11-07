@@ -2,6 +2,10 @@
   "compilerOptions": {
     "target": "ESNEXT",
     "module": "ESNEXT",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "jsx": "preserve",
     "strict": true,
     "noImplicitAny": true,

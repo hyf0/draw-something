@@ -1,0 +1,10 @@
+.view-room-creator {
+  background-color: #fff;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-flow: column nowrap;
+  .view-room-creator-main {
+    flex: 1;
+  }
+}

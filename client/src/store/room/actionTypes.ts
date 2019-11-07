@@ -1,0 +1,9 @@
+export const SET_ROOM_LIST = 'SET_ROOM_LIST';
+
+export const SET_CURRENT_ROOM_USERS = 'SET_CURRENT_ROOM_USERS';
+
+export const SET_CURRENT_ROOM_STATUS = 'SET_CURRENT_ROOM_STATUS';
+
+export const SET_CURRENT_GAME = 'SET_CURRENT_GAME';
+
+export const SET_ROOM = 'SET_ROOM';

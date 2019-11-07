@@ -1,0 +1,14 @@
+.avatar-box {
+  .avatar-box-avatar {
+    height: 48px;
+    width: 48px;
+    font-size: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .avatar-box-text {
+    font-size: 12px;
+    text-align: center;
+  }
+}
