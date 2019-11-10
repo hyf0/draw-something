@@ -10,3 +10,16 @@ export function createIncreaseIdGetter(start: number = 0) {
     return res;
   }
 }
+
+// console.log('\033[42;30m DONE \033[40;32m Compiled successfully in 19987ms\033[0m')
+
+
+export function log(...args: unknown[]) {
+  // const time = new Date().toLocaleTimeString();
+  // console.log('\033[43;33m LOG \033[40;32m  123 \033[0m', ...args);
+  console.log(`LOG-${new Date().toLocaleTimeString()}:`, ...args);
+}
+
+export function logError(...args: unknown[]) {
+  console.error(`ERROR-${new Date().toLocaleTimeString()}:`, ...args);
+}

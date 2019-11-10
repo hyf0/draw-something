@@ -15,6 +15,7 @@ import { RoomType, RoomStatus } from '@/util/constants';
 import RoomMessage from './components/RoomMessage';
 
 import './index.scss';
+import { useDocumentTitle } from '@/hooks';
 
 const selectorPlayingRoom = ({
   room: { currentRoom },
@@ -32,6 +33,7 @@ const roomTypeTextDict = {
 };
 
 export default function PlayingRoom() {
+  useDocumentTitle('游玩房间');
   const { currentRoom, wsClient, isReady } = useSelector(
     selectorPlayingRoom,
     shallowEqual,

@@ -1,11 +1,10 @@
 export enum DrawActionType {
   START_DRAW_LINE = 'startDrawLine',
   DRAW_LINE_TO = 'drawLineTo',
+  END_DRAW_LINE = 'endDrawLine',
   DRAW_IMAGE = 'drawImage',
   CLEAR_CANVAS = 'clearCanvas',
-  UNDO_DRAWING = 'undoDrawing',
-  REDO_DRAWING = 'redoDrawing',
-  SET_OPTIONS = 'setOptions',
+  // SET_OPTIONS = 'setOptions',
 }
 
 

@@ -21,6 +21,7 @@ import { globalEffects, roomEffects } from '@/store/effects';
 import { RoomType } from '@/util/constants';
 
 import './index.scss';
+import { useDocumentTitle } from '@/hooks';
 
 const indexSelector = ({
   global: { numberOfOnlinePlayer },
@@ -31,6 +32,8 @@ const indexSelector = ({
 });
 
 export default function CreateRoom() {
+  useDocumentTitle('创建房间');
+
   const { username } = useSelector(indexSelector, shallowEqual);
   const defaultRoomName = `${username}的房间`;
   const [roomName, setRoomName] = useState(defaultRoomName);

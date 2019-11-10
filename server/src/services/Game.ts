@@ -4,13 +4,11 @@ import DataService from './DataService';
 import UserService from './UserService';
 import { TGlobals } from '../globals';
 import Room from './Room';
+import User from './User';
 
 export default class Game {
   playTimes = this.room.playTimes;
   gameTime = this.room.gameTime;
-  players: {
-    [playerId: string]: UserService;
-  } = {};
   // userDraw = [];
   countScore = {};
   currentTimes = 1;
@@ -32,7 +30,6 @@ export default class Game {
       users: this.users,
       playTimes: this.playTimes,
       gameTime: this.gameTime,
-      players: this.players,
       newestDrawing: this.newestDrawing,
       // userDraw: this.userDraw,
       countScore: this.countScore,

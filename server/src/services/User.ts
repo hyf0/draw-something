@@ -3,6 +3,7 @@ import uuidv4 from 'uuid/v4';
 
 import DataService from './DataService';
 import { TGlobals } from '../globals';
+import { log } from '../util/helper';
 
 export default class User {
   public token = uuidv4();
@@ -55,9 +56,10 @@ export default class User {
 
     this.clearTimerId = setTimeout(() => {
       // 注意还没有用户在游戏中的时候，是否要删除他
+      log(`${this.username} is deleted`);
       this.globals.sesstionUserMap.delete(this.token);
       this.globals.userMap.delete(this.token);
-    }, 1000 * 60);
+    }, 1000 * 60 * 10);
   }
 
   // login(token?: string) {

@@ -39,10 +39,10 @@ export interface IGame {
   users: IPlayer[],
   playTimes: number,
   gameTime: number,
-  playerScore: {
+  userScore: {
     [playerId: string]: number,
   },
-  newestDrawing: string | null;
+  newestDrawing: string | undefined;
   // userDraw: string,
   countScore: number,
   currentTimes: number,

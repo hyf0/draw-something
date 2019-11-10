@@ -8,6 +8,7 @@ import RequestMessage from '../models/RequestMessage';
 import HandlerContext from '../models/HandlerContext';
 import UserService from '../services/UserService';
 import User from '../services/User';
+import { log, logError } from '../util/helper';
 
 
 export default class Connection {
@@ -26,18 +27,18 @@ export default class Connection {
   handlerMessage(rawMessage: NodeWebsocket.Data) {
     const reqMsg = parseRawMessage(rawMessage);
     if (IS_DEV) {
-      console.log(`reqeust ${reqMsg.handler}-${reqMsg.id}`, JSON.stringify(reqMsg.data, null, 2));
+      log(`reqeust ${reqMsg.handler}-${reqMsg.id}`, JSON.stringify(reqMsg.data, null, 2));
     }
 
     if (reqMsg.handler != undefined) {
       const hasHandler = reqMsg.handler in handlers;
-      if (!hasHandler) console.error(`请求了不存在的handler ${reqMsg.handler}`);
+      if (!hasHandler) logError(`请求了不存在的handler ${reqMsg.handler}`);
       else {
         const handler = handlers[reqMsg.handler];
         handler(this.buildContext(reqMsg, this.globals));
       }
     } else {
-      console.error('未注明请求的handler', JSON.stringify(reqMsg, null, 2));
+      logError('未注明请求的handler', JSON.stringify(reqMsg, null, 2));
     }
   }
 

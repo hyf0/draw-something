@@ -79,6 +79,7 @@ export default class WebsocketClient {
   //   this.sendMessage(msg);
   // }
 
+  // 不需要等待回复的请求不要用这个方法，会导致内存泄漏，因为无法触发对应reqesut Id的回调函数
   request(handler: string, data?: any) {
     return new Promise<ResponseMessage>((resolve, reject) => {
       try {

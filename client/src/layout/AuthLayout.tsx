@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
-import { push } from 'connected-react-router';
+import { replace } from 'connected-react-router';
 import { IReduxState } from '../store/reducers';
 
 const selectorAuthLoyout = ({ user: { user }, router: { location: { pathname } } }: IReduxState) => ({
@@ -24,10 +24,10 @@ export default function AuthLoyout({ children}: {children: any}) {
 
     if (user.isGaming && user.currentRoomId != null) {
       const targetPath = `/game/${user.currentRoomId}`;
-      if (pathname !== targetPath) dispatch(push(targetPath));
+      if (pathname !== targetPath) dispatch(replace(targetPath));
     } else if (user.currentRoomId != null) {
       const targetPath = `/room/${user.currentRoomId}`;
-      if (pathname !== targetPath) dispatch(push(targetPath));
+      if (pathname !== targetPath) dispatch(replace(targetPath));
     }
   }, [user, pathname, dispatch]);
 

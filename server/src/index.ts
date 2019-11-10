@@ -6,9 +6,10 @@ import UserService from './services/UserService';
 import GameService from './services/GameService';
 import Connection from './controllers/Connection';
 import globals from './globals';
+import { log } from './util/helper';
 
 if (IS_DEV) {
-  console.log('正处于开发模式中');
+  log('正处于开发模式中');
 }
 
 const globalMaps = {
@@ -26,7 +27,7 @@ const wss = new NodeWebsocket.Server(
     port: serverConfig.port,
   },
   () => {
-    console.log(
+    log(
       `draw something websocket server is started in ${wss.path ? wss.path : '/'}:${serverConfig.port}`,
     );
   },

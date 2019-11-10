@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { IconButton, Popover, Slider } from '@material-ui/core';
+import { IconButton, Popover } from '@material-ui/core';
 import {
   ColorLens as ColorIcon,
   FiberManualRecord as CircleIcon,

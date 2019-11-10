@@ -10,6 +10,7 @@ import AccountCard from './components/AccountCard';
 import GameLobbyHeader from './components/GameLobbyHeader';
 
 import './index.scss';
+import { useDocumentTitle } from '@/hooks';
 
 const indexSelector = ({
   global: { numberOfOnlinePlayer },
@@ -20,6 +21,8 @@ const indexSelector = ({
 });
 
 export default function GameLobby() {
+  useDocumentTitle('游戏大厅');
+
   const { numberOfOnlinePlayer, user } = useSelector(
     indexSelector,
     shallowEqual,
@@ -28,6 +31,7 @@ export default function GameLobby() {
   useEffect(() => {
     dispatch(globalEffects.getNumberOfOnlinePlayer());
   }, [dispatch]);
+
 
   if (user == null) return <FullScreenLoading />;
 

@@ -7,7 +7,7 @@ import FullScreenLoading from '@/ui/FullScreenLoading';
 import AvatarBox from '@/ui/AvatarBox';
 import { roomEffects } from '@/store/effects';
 
-import Canvas from './components/Canvas';
+import CanvasContainer from './components/CanvasContainer';
 import AnswerInputBox from './components/AnswerInputBox';
 
 import './index.scss';
@@ -59,10 +59,10 @@ export default function Game() {
         </Toolbar>
       </AppBar>
       <div className="view-game-main">
-        <Canvas
+        <CanvasContainer
           wsClient={wsClient}
-          dispatch={dispatch}
           isSelfPlaying={isSelfPlaying}
+          initialDrawing={currentGame.newestDrawing}
         />
         <div className="player-list">
           {currentGame.users.map(user => (
@@ -76,7 +76,7 @@ export default function Game() {
         </div>
       </div>
       <div className="view-game-footer">
-        <AnswerInputBox />
+        {isSelfPlaying ? null : <AnswerInputBox />}
       </div>
     </div>
   );

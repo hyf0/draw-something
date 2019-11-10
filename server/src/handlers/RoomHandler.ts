@@ -77,17 +77,13 @@ export default class RoomHandler {
   }
 
   static roomList(ctx: HandlerContext) {
-    const roomList: Room[] = [];
-    for (let room of ctx.globals.roomMap.values()) {
-      if (
-        room.status === RoomStatus.WAITING && // 不在游戏中
-        !room.isFulled && // 没有满
-        room.type === RoomType.PUBLIC // 非私人房间
-      ) {
-        roomList.push(room);
-      }
-      ctx.sendRespData(roomList);
-    }
+    const roomList = [...ctx.globals.roomMap.values()];
+    const filtedRoomList = roomList.filter(
+      room => room.status === RoomStatus.WAITING && // 不在游戏中
+      !room.isFulled && // 没有满
+      room.type === RoomType.PUBLIC // 非私人房间)
+    );
+    ctx.sendRespData(filtedRoomList);
   }
 
   static startGameIfAllPlayerIsReady(ctx: HandlerContext) {
