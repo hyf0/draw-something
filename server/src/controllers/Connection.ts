@@ -6,7 +6,6 @@ import { IS_DEV } from '../util/contants';
 import handlers from '../handlers';
 import RequestMessage from '../models/RequestMessage';
 import HandlerContext from '../models/HandlerContext';
-import UserService from '../services/UserService';
 import User from '../services/User';
 import { log, logError } from '../util/helper';
 

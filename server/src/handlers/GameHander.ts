@@ -27,4 +27,8 @@ export default class GameHandler {
     game.newestDrawing = newestDrawing;
     room.sendMessageToUsersButUser(drawAction, 'drawAction', user);
   }
+
+  static guessAnswer(ctx: HandlerContext) {
+    const { user, room, game, req } = ctx;
+  }
 }

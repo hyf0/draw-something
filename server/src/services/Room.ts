@@ -6,6 +6,7 @@ import ResponseMessage from '../models/ResponseMessage';
 import { TGlobals } from '../globals';
 import User from './User';
 import ChattingMessage from '../models/ChattingMessage';
+import RequestMessage from '../models/RequestMessage';
 
 const getNextRoomId = createIncreaseIdGetter(1);
 
@@ -124,6 +125,22 @@ export default class Room {
     );
     room.users.forEach(u => {
       if (u.id !== butUser.id) SenderService.send(u.ws, respMsg);
+    });
+  }
+
+  refreshRoomList() {
+    const roomList = [...this.globals.roomMap.values()];
+    const users = [...this.globals.userMap.values()];
+    const filtedRoomList = roomList.filter(
+      room => room.status === RoomStatus.WAITING && // 不在游戏中
+      !room.isFulled && // 没有满
+      room.type === RoomType.PUBLIC // 非私人房间)
+    );
+    users.forEach(u => {
+      if (!u.isGaming && u.currentRoomId == undefined) {
+        const m = new ResponseMessage(filtedRoomList, undefined, 'refreshRoomList');
+        SenderService.send(u.ws, m);
+      }
     });
   }
 }

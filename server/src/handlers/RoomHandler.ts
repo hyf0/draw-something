@@ -12,6 +12,8 @@ export default class RoomHandler {
     };
     const room = new Room({ name, type }, ctx.globals);
     ctx.sendRespData(room);
+
+    room.refreshRoomList();
   }
 
   static userEnter(ctx: HandlerContext) {
@@ -42,20 +44,28 @@ export default class RoomHandler {
           id: 'game',
         }),
       );
+
+      room.refreshRoomList();
+
     }
   }
 
   static userLeave(ctx: HandlerContext) {
     const { room, user } = ctx;
     if (room == undefined || user == undefined) return;
+
     room.removePlayerInRoom(user);
     room.sendMessageToUsers(room, 'refreshRoomInfo');
+
     room.sendChattingMessageToUsers(
       new ChattingMessage(`${user.username} 离开了游戏`, {
         name: '游戏平台',
         id: 'game',
       }),
     );
+
+    room.refreshRoomList();
+
   }
 
   static sendChatMessage(ctx: HandlerContext) {
@@ -99,6 +109,8 @@ export default class RoomHandler {
         user,
         game,
       }, 'startGame');
+
+      room.refreshRoomList();
     }
   }
 

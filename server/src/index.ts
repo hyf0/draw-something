@@ -1,9 +1,7 @@
 import NodeWebsocket from 'ws';
 import { IS_DEV } from './util/contants';
 import { serverConfig } from './config';
-import RoomService from './services/RoomService';
-import UserService from './services/UserService';
-import GameService from './services/GameService';
+
 import Connection from './controllers/Connection';
 import globals from './globals';
 import { log } from './util/helper';
@@ -11,16 +9,6 @@ import { log } from './util/helper';
 if (IS_DEV) {
   log('正处于开发模式中');
 }
-
-const globalMaps = {
-  userMap: new Map<string, UserService>(),
-  roomMap: new Map<number, RoomService>(),
-  gameMap:  new Map<number, GameService>(),
-};
-
-export type TGlobalMaps = typeof globalMaps;
-
-// ws server
 
 const wss = new NodeWebsocket.Server(
   {

@@ -1,8 +1,5 @@
 import NodeWebsocket from 'ws';
 
-import UserService from '../services/UserService';
-import RoomService from '../services/RoomService';
-import GameService from '../services/GameService';
 import { TGlobals } from '../globals';
 import RequestMessage from './RequestMessage';
 import ResponseMessage from './ResponseMessage';
