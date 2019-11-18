@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 
 import nicknames from "../util/nicknames";
-import { randomIntBetween } from 'server/util/helper';
+import { randomIntBetween } from '../../server/util/helper';
 
 const projectSrcPath = path.resolve(__dirname, '../');
 const wordData = fs.readFileSync(`${projectSrcPath}/word.txt`, 'utf-8');
