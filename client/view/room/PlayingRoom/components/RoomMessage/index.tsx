@@ -49,7 +49,7 @@ function RoomMessage() {
           <ListItem className="room-message-list-item" key={cm.id}>
             <div className="room-message-speaker">
               <span className="room-message-speaker-name">
-                {cm.speaker.id === userId ? '我' : cm.speaker.name}说:
+                {cm.speaker.id === userId ? '我' : cm.speaker.name}:
               </span>
 
             </div>

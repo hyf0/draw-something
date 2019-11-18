@@ -60,7 +60,7 @@ export default class RoomHandler {
 
     room.sendChattingMessageToUsers(
       new ChattingMessage(`${user.username} 离开了游戏`, {
-        name: '游戏平台',
+        name: '你画我猜',
         id: 'game',
       }),
     );
@@ -106,6 +106,8 @@ export default class RoomHandler {
       usersOfRoom.forEach(u => u.isGaming = true);
       const game = new Game(room, ctx.globals);
       room.status = RoomStatus.GAMING;
+      usersOfRoom.forEach(u => u.isGaming = false); // 重置user.isReady状态
+
       room.sendMessageToUsers({
         user,
         game,
@@ -125,13 +127,12 @@ export default class RoomHandler {
       room,
     });
 
-    room.sendMessageToUsersButUser(
-      room,
-      'refreshRoomInfo',
-      user,
-      `${user.username} 准备了`,
+    room.sendChattingMessageToUsers(
+      new ChattingMessage(`${user.username} 准备了`, {
+        name: '你画我猜',
+        id: 'game',
+      }),
     );
-
     RoomHandler.startGameIfAllPlayerIsReady(ctx);
   }
 

@@ -50,11 +50,18 @@ export default function Game() {
       };
       dispatch(roomActions.createSetCurrentGame(game));
     });
+    const changePlayingUserOff = wsClient.on('changePlayingUser', msgData => {
+      const { game } = msgData as {
+        game: IGame;
+      };
+      dispatch(roomActions.createSetCurrentGame(game));
+    });
 
     return () => {
       wrongGuessOff();
       gameOverOff();
       refreshGameOff();
+      changePlayingUserOff();
     };
   }, [setChattingList, dispatch, wsClient]);
 
@@ -109,7 +116,7 @@ export default function Game() {
         <div className="game-message-list">
           {chattingList.map(c => (
             <div key={c.id} className="game-message-list-item">
-              {c.speaker.name} 猜：{c.content}
+              {c.speaker.name}: {c.content}
             </div>
           ))}
           <div className="game-message-list-item">车笔刀 猜：汽车</div>

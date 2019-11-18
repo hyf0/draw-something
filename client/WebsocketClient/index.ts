@@ -7,7 +7,10 @@ export default class WebsocketClient {
   isConnected = false;
   ws: WebSocket;
   messageCache: RequestMessage[] = [];
-  eventMap = new Map<string, (messageData: unknown, message: RequestMessage) => void>();
+  eventMap = new Map<
+    string,
+    ((messageData: unknown, message: RequestMessage) => void)[]
+  >();
   constructor(
     public options: {
       addr: string;
@@ -87,8 +90,7 @@ export default class WebsocketClient {
         // const messageId = type + '_' + new Date().getTime() // 这是为了防止收到过时的信息
         // const msg: RequestMessage = {data, type, id: messageId}
         const reqMsg = new RequestMessage(data, handler);
-        this.on(reqMsg.id, (_, respMsg) => {
-
+        const callback = (_: unknown, respMsg: ResponseMessage) => {
           if (respMsg == null) {
             console.error(`${reqMsg.handler}-${reqMsg.id} 返回来空的message`);
           }
@@ -102,7 +104,7 @@ export default class WebsocketClient {
           resolve(respMsg);
 
           if (respMsg.requestId != null) {
-            this.off(respMsg.requestId);
+            this.off(respMsg.requestId, callback);
           }
           if (IS_DEV_CLIENT) {
             if (respMsg.requestId != null && respMsg.requestId !== reqMsg.id) {
@@ -111,7 +113,8 @@ export default class WebsocketClient {
               );
             }
           }
-        });
+        };
+        this.on(reqMsg.id, callback);
         this.sendMessage(reqMsg);
       } catch (err) {
         console.error(`request时发生错误 ${err}`);
@@ -119,17 +122,34 @@ export default class WebsocketClient {
     });
   }
 
-  on(eventName: string, callback: (messageData: unknown, message: ResponseMessage) => void) {
-    this.eventMap.set(eventName, callback);
+  on(
+    eventName: string,
+    callback: (messageData: unknown, message: ResponseMessage) => void,
+  ) {
+    let cbsArray = this.eventMap.get(eventName);
+    if (cbsArray == undefined) {
+      cbsArray = [];
+      this.eventMap.set(eventName, cbsArray);
+    }
+    cbsArray.push(callback);
     return () => {
-      this.off(eventName);
+      this.off(eventName, callback);
     };
   }
-  off(eventName: string) {
-    this.eventMap.delete(eventName);
+  off(
+    eventName: string,
+    cb: (messageData: unknown, message: RequestMessage) => void,
+  ) {
+    let cbsArray = this.eventMap.get(eventName);
+    if (cbsArray != undefined) {
+      cbsArray = cbsArray.filter(c => c !== cb);
+      this.eventMap.set(eventName, cbsArray);
+    }
   }
   emit(eventName: string, msg: RequestMessage) {
-    const callback = this.eventMap.get(eventName);
-    if (typeof callback === 'function') callback(msg.data, msg);
+    const cbs = this.eventMap.get(eventName);
+    if (cbs !== undefined) {
+      cbs.forEach(c => c(msg.data, msg));
+    }
   }
 }

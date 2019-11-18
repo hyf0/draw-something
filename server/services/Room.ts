@@ -84,6 +84,7 @@ export default class Room {
     if (this.status === RoomStatus.WAITING) {
       // 不确定游戏中是否可以退出，应该可以
       user.currentRoomId = undefined;
+      user.isReady = false;
       this.userIdSet.delete(user.id);
       if (this.userNumber === 0) {
         this.globals.roomMap.delete(this.id);

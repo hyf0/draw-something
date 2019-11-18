@@ -15,27 +15,6 @@ export function login(): TReduxThunk {
   };
 }
 
-export function startListenRefreshPlayerInfo(): TReduxThunk {
-  return async (dispatch, getState) => {
-    const {
-      connection: { wsClient },
-    } = getState();
-    wsClient.on('refreshPlayerInfo', msgData => {
-      const user = msgData as IUser;
-      dispatch(userActions.createSetUser(user));
-    });
-  };
-}
-
-export function stopListenRefreshPlayerInfo(): TReduxThunk {
-  return async (dispatch, getState) => {
-    const {
-      connection: { wsClient },
-    } = getState();
-    wsClient.off('refreshPlayerInfo');
-  };
-}
-
 export function changeUsername(username: string): TReduxThunk {
   return async (dispatch, getState) => {
     const {

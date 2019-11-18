@@ -60,7 +60,7 @@ export default class GameHandler {
           //   id: 'game',
           // }))
         } else {
-          room.sendMessageToUsers({ game }, 'refreshGame', '切换到下一个玩家');
+          room.sendMessageToUsers({ game }, 'changePlayingUser', '切换到下一个玩家');
         }
       }
       SenderService.send(

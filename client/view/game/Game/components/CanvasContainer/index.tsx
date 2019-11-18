@@ -11,6 +11,8 @@ import React, { createRef, TouchEvent } from 'react';
 import RequestMessage from '../../../../../../shared/models/RequestMessage';
 import SetPenColorButton from './SetPenColorButton';
 import SetPenSizeButton from './SetPenSizeButton';
+import { roomActions } from '@client/store/actions';
+import { IGame } from 'shared/types';
 
 // import RequestMessage from '@client/WebsocketClient/models/RequestMessage';
 
@@ -41,6 +43,10 @@ export default class Canvas extends React.PureComponent<
 
   // 生命周期
 
+  //
+  changePlayingUserOff: undefined | (() => void);
+  drawActionOff: undefined | (() => void);
+
   componentDidMount() {
     this.draw.mount('#id-canvas');
     this.bindEvents();
@@ -51,14 +57,22 @@ export default class Canvas extends React.PureComponent<
   }
 
   componentWillUnmount() {
-    const { wsClient } = this.props;
-    wsClient.off('drawAction');
+    this.changePlayingUserOff && this.changePlayingUserOff();
+    this.drawActionOff && this.drawActionOff();
   }
 
   bindEvents() {
     const { wsClient } = this.props;
     const { draw } = this;
-    wsClient.on('drawAction', respMsgData => {
+    this.changePlayingUserOff = wsClient.on('changePlayingUser', () => { // 清除别人在画布上的东西
+      this.clearCanvas();
+      this.setState({
+        futureDrawings: [],
+        pastDrawings: [],
+      });
+    });
+
+    this.drawActionOff = wsClient.on('drawAction', respMsgData => {
       // if (!this.props.isSelfPlaying) return; // 不能写上面，闭包导致无法取得变量最新值
       const drawAction = respMsgData as DrawAction;
       const { type, payload } = drawAction;
