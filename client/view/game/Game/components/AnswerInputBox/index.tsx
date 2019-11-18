@@ -3,7 +3,7 @@ import { TextField, Button } from '@material-ui/core';
 
 import './index.scss';
 import WebsocketClient from '@src/WebsocketClient';
-import RequestMessage from '@src/WebsocketClient/models/RequestMessage';
+import RequestMessage from '@shared/models/RequestMessage';
 
 // 以 375宽 为标准
 

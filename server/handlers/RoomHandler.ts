@@ -1,8 +1,9 @@
+import { RoomStatus, RoomType } from '@shared/constants/room';
+import ChattingMessage from '@shared/models/ChattingMessage';
+
 import HandlerContext from '../models/HandlerContext';
-import { RoomStatus, RoomType } from '../util/contants';
-import Room from '../services/Room';
-import ChattingMessage from '../models/ChattingMessage';
 import Game from '../services/Game';
+import Room from '../services/Room';
 
 export default class RoomHandler {
   static createRoom(ctx: HandlerContext) {

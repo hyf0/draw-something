@@ -1,27 +1,26 @@
-import React, { useEffect, useCallback, useState, ChangeEvent } from 'react';
+import './index.scss';
+
 import {
   AppBar,
-  Toolbar,
-  Typography,
   Button,
-  List,
-  ListItem,
-  TextField,
   FormControl,
   FormControlLabel,
+  List,
+  ListItem,
   Radio,
   RadioGroup,
+  TextField,
+  Toolbar,
+  Typography,
 } from '@material-ui/core';
 import { ArrowBackOutlined as BackIcon } from '@material-ui/icons';
-import { useDispatch, useSelector, shallowEqual } from 'react-redux';
-import { goBack } from 'connected-react-router';
-
-import { IReduxState } from '@src/store/reducers';
-import { globalEffects, roomEffects } from '@src/store/effects';
-import { RoomType } from '@src/util/constants';
-
-import './index.scss';
+import { RoomType } from '@shared/constants/room';
 import { useDocumentTitle } from '@src/hooks';
+import { globalEffects, roomEffects } from '@src/store/effects';
+import { IReduxState } from '@src/store/reducers';
+import { goBack } from 'connected-react-router';
+import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 const indexSelector = ({
   global: { numberOfOnlinePlayer },

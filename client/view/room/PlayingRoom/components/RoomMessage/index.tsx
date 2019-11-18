@@ -1,18 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  TextField,
-  List,
-  ListItem,
-  Button,
-} from '@material-ui/core';
-import { useSelector, shallowEqual, useDispatch } from 'react-redux';
-
-import { IChattingMessage } from '@src/model/types';
-import { IReduxState } from '@src/store/reducers';
-import { roomEffects } from '@src/store/effects';
-import { createHandleOnKeyEnterUp } from '@src/util/helper';
-
 import './index.scss';
+
+import { Button, List, ListItem, TextField } from '@material-ui/core';
+import { roomEffects } from '@src/store/effects';
+import { IReduxState } from '@src/store/reducers';
+import { createHandleOnKeyEnterUp } from '@src/util/helper';
+import React, { useCallback, useEffect, useState } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import ChattingMessage from '@shared/models/ChattingMessage';
 
 const selectorRoomMessage = ({
   connection: { wsClient },
@@ -28,10 +22,10 @@ function RoomMessage() {
     selectorRoomMessage,
     shallowEqual,
   );
-  const [chatMsgList, setChatMsgList] = useState<IChattingMessage[]>([]);
+  const [chatMsgList, setChatMsgList] = useState<ChattingMessage[]>([]);
   useEffect(() => {
     const offReciveChatMessage = wsClient.on('reciveChatMessage', (_, msg) => {
-      const chatMsg = msg.data as IChattingMessage;
+      const chatMsg = msg.data as ChattingMessage;
       setChatMsgList(prev => [chatMsg].concat(...prev));
     });
     return offReciveChatMessage;

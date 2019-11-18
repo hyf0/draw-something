@@ -1,11 +1,12 @@
+import { IUser } from '@shared/types';
 import { produce } from 'immer';
+
 import { IAction } from '../actions';
 import { userActionTypes } from '../actionTypes';
-import { IPlayer } from '../../model/types';
 
 export interface IReduxUserState {
   isLogining: boolean;
-  user: null | IPlayer;
+  user: null | IUser;
   isRegistering: boolean;
 }
 
@@ -25,7 +26,7 @@ export default function userReducer(state = defaultState, action: IAction) {
         }
         break;
       case userActionTypes.SET_USER:
-        draft.user = payload as IPlayer;
+        draft.user = payload as IUser;
         break;
       case userActionTypes.SET_IS_GAMING:
         if (draft.user != null) {
@@ -40,7 +41,7 @@ export default function userReducer(state = defaultState, action: IAction) {
 
       case userActionTypes.SET_USER_CURRENT_ROOM_ID:
         if (draft.user != null) {
-          draft.user.currentRoomId = payload as number | null;
+          draft.user.currentRoomId = payload as number | undefined;
         }
         break;
     }

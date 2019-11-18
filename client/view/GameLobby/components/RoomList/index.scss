@@ -8,12 +8,30 @@
     padding: 20px 0;
     font-size: 1.5em;
   }
-  .room-list-item-wrapper {
-    padding: 0;
-    // overflow: scroll;
-    .room-list-item {
-      flex: 1;
-      color: #fff;
+  .room-list-content {
+    display: flex;
+    flex-flow: row wrap;
+    padding: 0 10px;
+  }
+    .room-list-room {
+      // flex: 1;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 5px;
+      width: 150px;
+      .room-name {
+        font-size: 18px;
+      }
+      .room-info {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        .room-number {
+          font-size: 16px;
+        }
+        .room-status {
+          font-size: 14px;
+        }
+      }
       .room-list-item-header {
         padding: 12px;
         font-size: 18px;
@@ -41,5 +59,4 @@
         }
       }
     }
-  }
 }

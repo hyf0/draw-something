@@ -4,9 +4,10 @@
     "module": "UMD",
     "baseUrl": ".",
     "paths": {
+      "@shared/*": ["./shared/*"],
       "@src/*": ["./client/*"],
-      "@share/*": ["./shared/*"]
     },
+    "outDir": "./dist",
     "jsx": "preserve",
     "strict": true,
     "noImplicitAny": true,
@@ -28,6 +29,7 @@
   },
   "include": [
     "shared",
-    "client"
+    "client",
+    "server",
   ]
 }

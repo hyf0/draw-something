@@ -1,7 +1,3 @@
-import { getIsDevelopment } from "./helper";
-
-export const IS_DEV = getIsDevelopment();
-
 export enum RoomStatus {
   WAITING = 'waiting',
   GAMING = 'gaming',

@@ -1,5 +1,6 @@
 import NodeWebsocket from 'ws';
-import ResponseMessage from '../models/ResponseMessage';
+
+import ResponseMessage from '@shared/models/ResponseMessage';
 import { IS_DEV } from '../util/contants';
 import { logError, log } from '../util/helper';
 
@@ -14,12 +15,12 @@ export default class SenderService {
 
   static send(ws: NodeWebsocket, msg: ResponseMessage) {
     if (IS_DEV) {
-      log(
-        `sendBack ${msg.trigger ? `${msg.trigger}-` : ''}${
-          msg.requestId ? msg.requestId : ''
-        }`,
-        JSON.stringify(msg, null, 2),
-      );
+      // log(
+      //   `sendBack ${msg.trigger ? `${msg.trigger}-` : ''}${
+      //     msg.requestId ? msg.requestId : ''
+      //   }`,
+      //   JSON.stringify(msg, null, 2),
+      // );
     }
     this.sendResponseMessage(ws, msg);
   }

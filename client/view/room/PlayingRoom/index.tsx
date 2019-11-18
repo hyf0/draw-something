@@ -1,21 +1,20 @@
-import React, { useEffect, useCallback } from 'react';
-import { AppBar, Toolbar, Typography, Button } from '@material-ui/core';
-import { useParams, Redirect } from 'react-router-dom';
-import { ArrowBackOutlined as BackIcon } from '@material-ui/icons';
-import { useDispatch, useSelector, shallowEqual, batch as batchDispatch } from 'react-redux';
-import { push } from 'connected-react-router';
+import './index.scss';
 
-import { IReduxState } from '@src/store/reducers';
-import { roomEffects } from '@src/store/effects';
-import FullScreenLoading from '@src/ui/FullScreenLoading';
-import { IPlayer, IRoom, IGame } from '@src/model/types';
+import { AppBar, Button, Toolbar, Typography } from '@material-ui/core';
+import { ArrowBackOutlined as BackIcon } from '@material-ui/icons';
+import { RoomStatus, RoomType } from '@shared/constants/room';
+import { IGame, IRoom, IUser } from '@shared/types';
+import { useDocumentTitle } from '@src/hooks';
 import { roomActions, userActions } from '@src/store/actions';
-import { RoomType, RoomStatus } from '@src/util/constants';
+import { roomEffects } from '@src/store/effects';
+import { IReduxState } from '@src/store/reducers';
+import FullScreenLoading from '@src/ui/FullScreenLoading';
+import { push } from 'connected-react-router';
+import React, { useCallback, useEffect } from 'react';
+import { batch as batchDispatch, shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { Redirect, useParams } from 'react-router-dom';
 
 import RoomMessage from './components/RoomMessage';
-
-import './index.scss';
-import { useDocumentTitle } from '@src/hooks';
 
 const selectorPlayingRoom = ({
   room: { currentRoom },
@@ -53,7 +52,7 @@ export default function PlayingRoom() {
     });
     const allPlayerReadyOff = wsClient.on('startGame', (_, msg) => {
       const { user, game } = msg.data as {
-        user: IPlayer,
+        user: IUser,
         game: IGame,
       };
       batchDispatch(() => {

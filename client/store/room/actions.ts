@@ -1,7 +1,7 @@
 import { IAction } from '../actions';
 import { roomActionTypes } from '../actionTypes';
-import { IRoom, IPlayer, IGame } from '../../model/types';
-import { RoomStatus } from '@src/util/constants';
+import { IRoom, IUser, IGame } from '@shared/types';
+import { RoomStatus } from '@shared/constants/room';
 
 export function createSetRoomList(roomList: any[]): IAction {
   return {
@@ -10,7 +10,7 @@ export function createSetRoomList(roomList: any[]): IAction {
   };
 }
 
-export function createSetCurrentRoomUsers(users: IPlayer[]): IAction {
+export function createSetCurrentRoomUsers(users: IUser[]): IAction {
   return {
     type: roomActionTypes.SET_CURRENT_ROOM_USERS,
     payload: users,

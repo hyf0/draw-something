@@ -1,12 +1,11 @@
 import NodeWebsocket from 'ws';
-
+import RequestMessage from '@shared/models/RequestMessage';
 import { TGlobals } from '../globals';
-import { parseRawMessage } from '../middleware/parseMessage';
-import { IS_DEV } from '../util/contants';
 import handlers from '../handlers';
-import RequestMessage from '../models/RequestMessage';
+import { parseRawMessage } from '../middleware/parseMessage';
 import HandlerContext from '../models/HandlerContext';
 import User from '../services/User';
+import { IS_DEV } from '../util/contants';
 import { log, logError } from '../util/helper';
 
 

@@ -1,8 +1,8 @@
 import NodeWebsocket from 'ws';
 
 import { TGlobals } from '../globals';
-import RequestMessage from './RequestMessage';
-import ResponseMessage from './ResponseMessage';
+import RequestMessage from '@shared/models/RequestMessage';
+import ResponseMessage from '@shared/models/ResponseMessage';
 import SenderService from '../services/SenderService';
 import User from '../services/User';
 import Connection from '../controllers/Connection';

@@ -1,6 +1,7 @@
 import { IS_DEV } from '../util/constants';
-import ResponseMessage from './models/ResponseMessage';
-import RequestMessage from './models/RequestMessage';
+import ResponseMessage from '@shared/models/ResponseMessage';
+import RequestMessage from '@shared/models/RequestMessage';
+// import RequestMessage from './models/RequestMessage';
 
 export default class WebsocketClient {
   isConnected = false;

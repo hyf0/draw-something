@@ -1,5 +1,4 @@
-import React, { TouchEvent, Ref, createRef } from 'react';
-import { produce } from 'immer';
+import React, { TouchEvent, createRef } from 'react';
 
 import { IconButton } from '@material-ui/core';
 import {
@@ -20,7 +19,7 @@ import SetPenSizeButton from './SetPenSizeButton';
 import SetPenColorButton from './SetPenColorButton';
 
 import './Canvas.scss';
-import RequestMessage from '@src/WebsocketClient/models/RequestMessage';
+import RequestMessage from '@shared/models/RequestMessage';
 
 interface ICanvasState {
   futureDrawings: string[];
@@ -53,7 +52,7 @@ export default class Canvas extends React.PureComponent<
     this.draw.mount('#id-canvas');
     this.bindEvents();
     const { initialDrawing } = this.props;
-    if (initialDrawing != undefined) {
+    if (initialDrawing !== undefined) {
       this.draw.drawImage(initialDrawing);
     }
   }
@@ -124,7 +123,7 @@ export default class Canvas extends React.PureComponent<
     const reqMsg = new RequestMessage(
       {
         drawAction,
-        ...(extral != undefined ? extral : {}),
+        ...(extral !== undefined ? extral : {}),
       },
       'drawAction',
     );

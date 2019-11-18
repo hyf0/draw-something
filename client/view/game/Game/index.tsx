@@ -1,16 +1,18 @@
-import React, { useEffect, useMemo } from 'react';
-import { shallowEqual, useSelector, useDispatch } from 'react-redux';
-import { AppBar, Typography, Toolbar } from '@material-ui/core';
-
-import { IReduxState } from '@src/store/reducers';
-import FullScreenLoading from '@src/ui/FullScreenLoading';
-import AvatarBox from '@src/ui/AvatarBox';
-import { roomEffects } from '@src/store/effects';
-
-import CanvasContainer from './components/CanvasContainer';
-import AnswerInputBox from './components/AnswerInputBox';
-
 import './index.scss';
+
+import { AppBar, Toolbar, Typography } from '@material-ui/core';
+import { roomEffects } from '@src/store/effects';
+import { IReduxState } from '@src/store/reducers';
+import AvatarBox from '@src/ui/AvatarBox';
+import FullScreenLoading from '@src/ui/FullScreenLoading';
+import React, { useEffect, useMemo, useState } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+
+import AnswerInputBox from './components/AnswerInputBox';
+import CanvasContainer from './components/CanvasContainer';
+import ChattingMessage from '@shared/models/ChattingMessage';
+import { roomActions, userActions } from '@src/store/actions';
+import { IGame, IUser } from '@shared/types';
 
 const selectorGame = ({
   room: { currentGame },
@@ -29,6 +31,33 @@ export default function Game() {
   );
 
   const dispatch = useDispatch();
+  const [chattingList, setChattingList] = useState<ChattingMessage[]>([]);
+  useEffect(() => {
+    const wrongGuessOff = wsClient.on('chattingMessage', msgData => {
+      setChattingList(prevList => [msgData as ChattingMessage, ...prevList]);
+    });
+
+    const gameOverOff = wsClient.on('gameOver', msgData => {
+      const { user } = msgData as {
+        user: IUser;
+      };
+      dispatch(userActions.createSetIsGaming(user.isGaming));
+    });
+
+    const refreshGameOff = wsClient.on('refreshGame', msgData => {
+      const { game } = msgData as {
+        game: IGame;
+      };
+      dispatch(roomActions.createSetCurrentGame(game));
+    });
+
+    return () => {
+      wrongGuessOff();
+      gameOverOff();
+      refreshGameOff();
+    };
+  }, [setChattingList, dispatch, wsClient]);
+
   useEffect(() => {
     if (currentGame == null) {
       dispatch(roomEffects.getGame());
@@ -42,7 +71,7 @@ export default function Game() {
     return false;
   }, [user, currentGame]);
 
-  if (currentGame == null) return <FullScreenLoading />;
+  if (currentGame == null || user == null) return <FullScreenLoading />;
 
   return (
     <div className="view-game">
@@ -54,7 +83,9 @@ export default function Game() {
       >
         <Toolbar>
           <Typography variant="h6">
-            {isSelfPlaying ? `请画 ${currentGame.playInfo.keyword[0]}` : `${currentGame.playInfo.keyword[1].length}个字 ${currentGame.playInfo.keyword[1]}`}
+            {isSelfPlaying
+              ? `请画 ${currentGame.playInfo.keyword.raw}`
+              : `${currentGame.playInfo.keyword.raw.length}个字 ${currentGame.playInfo.keyword.hint}`}
           </Typography>
         </Toolbar>
       </AppBar>
@@ -65,14 +96,23 @@ export default function Game() {
           initialDrawing={currentGame.newestDrawing}
         />
         <div className="player-list">
-          {currentGame.users.map(user => (
-            <div key={user.id} className="player-list-item">
-              <AvatarBox text={user.username} />
+          {currentGame.users.map(gameUser => (
+            <div key={gameUser.id} className="player-list-item">
+              <AvatarBox
+                text={`${gameUser.username}${
+                  gameUser.id === user.id ? '(我)' : ''
+                }(${currentGame.userScores[gameUser.id]}}分)`}
+              />
             </div>
           ))}
         </div>
         <div className="game-message-list">
-          <div className="game-message-list-item">车笔刀猜：汽车</div>
+          {chattingList.map(c => (
+            <div key={c.id} className="game-message-list-item">
+              {c.speaker.name} 猜：{c.content}
+            </div>
+          ))}
+          <div className="game-message-list-item">车笔刀 猜：汽车</div>
         </div>
       </div>
       <div className="view-game-footer">

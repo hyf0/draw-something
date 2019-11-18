@@ -1,6 +1,6 @@
 import { IAction } from '../actions';
 import { userActionTypes } from '../actionTypes';
-import { IPlayer } from '../../model/types';
+import { IUser } from '@shared/types';
 
 export function createSetUsername(username: string): IAction {
   return {
@@ -9,7 +9,7 @@ export function createSetUsername(username: string): IAction {
   };
 }
 
-export function createSetUser(user: IPlayer): IAction {
+export function createSetUser(user: IUser): IAction {
   return {
     type: userActionTypes.SET_USER,
     payload: user,
@@ -23,7 +23,7 @@ export function createSetIsGaming(status: boolean): IAction {
   }
 }
 
-export function createSetUserCurrentRoomId(rid: number | null): IAction {
+export function createSetUserCurrentRoomId(rid: number | undefined): IAction {
   return {
     type: userActionTypes.SET_USER_CURRENT_ROOM_ID,
     payload: rid,

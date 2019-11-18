@@ -18,6 +18,7 @@ const handlers: {
   sendChatMessage: RoomHandler.sendChatMessage,
   getGame: GameHandler.getGame,
   drawAction: GameHandler.drawAction,
+  guessAnswer: GameHandler.guessAnswer,
 }
 
 export default handlers;

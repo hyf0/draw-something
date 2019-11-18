@@ -1,12 +1,13 @@
+import ResponseMessage from '@shared/models/ResponseMessage';
 
-import { createIncreaseIdGetter } from '../util/helper';
-import { RoomStatus, RoomType } from '../util/contants';
-import SenderService from './SenderService';
-import ResponseMessage from '../models/ResponseMessage';
 import { TGlobals } from '../globals';
+import { RoomStatus, RoomType } from '@shared/constants/room';
+import { createIncreaseIdGetter } from '../util/helper';
+import SenderService from './SenderService';
 import User from './User';
-import ChattingMessage from '../models/ChattingMessage';
-import RequestMessage from '../models/RequestMessage';
+import { IRoom } from '@shared/types';
+import ChattingMessage from '@shared/models/ChattingMessage';
+
 
 const getNextRoomId = createIncreaseIdGetter(1);
 
@@ -53,13 +54,13 @@ export default class Room {
     globals.roomMap.set(this.id, this);
   }
 
-  toJSON() {
+  toJSON(): IRoom {
     // 重载对象的JSON.stringfy方法，防止暴露不必要，或私密的属性
     return {
       name: this.name,
       type: this.type,
       id: this.id,
-      users: this.users,
+      users: this.users.map(u => u.toJSON()),
       status: this.status,
       maxPlayerNumber: this.maxPlayerNumber,
       createAt: this.createAt,
@@ -144,3 +145,4 @@ export default class Room {
     });
   }
 }
+

@@ -4,8 +4,8 @@ import { replace } from 'connected-react-router';
 
 import { TReduxThunk } from '../effects';
 import { roomActions, userActions, globalActions } from '../actions';
-import { RoomType, RoomStatus } from '../../util/constants';
-import { IRoom, IPlayer, IGame } from '../../model/types';
+import { RoomStatus, RoomType } from '@shared/constants/room';
+import { IRoom, IUser, IGame } from '@shared/types';
 import Notification, { NotificationType } from '@src/model/Notification';
 
 export function getRoomList(): TReduxThunk {
@@ -38,7 +38,7 @@ export function enterRoom(roomId: number): TReduxThunk {
 
       const { room, user } = respMsg.data as {
         room: IRoom;
-        user: IPlayer;
+        user: IUser;
       };
       batchDispatch(() => {
         dispatch(roomActions.createSetRoom(room));
@@ -63,7 +63,7 @@ export function leaveRoom(): TReduxThunk {
     if (user == null || user.currentRoomId == null) return;
     try {
       wsClient.request('userLeave');
-      dispatch(userActions.createSetUserCurrentRoomId(null));
+      dispatch(userActions.createSetUserCurrentRoomId(undefined));
       dispatch(roomActions.createSetRoom(null));
       dispatch(push('/'));
     } catch (err) {
@@ -113,7 +113,7 @@ export function makeGameIsReady(ready: boolean): TReduxThunk {
     try {
       const respMsg = await wsClient.request(requestType);
       const { user, room } = respMsg.data as {
-        user: IPlayer;
+        user: IUser;
         room: IRoom;
       };
       dispatch(roomActions.createSetCurrentRoomUsers(room.users));
@@ -133,7 +133,7 @@ export function getGame(): TReduxThunk {
     try {
       const respMsg = await wsClient.request('getGame');
       const { game } = respMsg.data as {
-        user: IPlayer;
+        user: IUser;
         game: IGame;
       };
       dispatch(roomActions.createSetCurrentGame(game));

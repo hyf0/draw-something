@@ -1,5 +1,7 @@
+
+import { isRequestMessage } from '@shared/models/RequestMessage';
+
 import NodeWebsocket from 'ws';
-import { isRequestMessage } from '../models/RequestMessage';
 
 export function parseRawMessage(rawMessage: NodeWebsocket.Data) {
   const msg = JSON.parse(rawMessage.toString());

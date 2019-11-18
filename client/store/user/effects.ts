@@ -1,7 +1,7 @@
 import { TReduxThunk } from '../effects';
 import { userActions } from '../actions';
 import { getToken, setToken } from '../../util/helper';
-import { IPlayer } from '../../model/types';
+import { IUser } from '@shared/types';
 
 export function login(): TReduxThunk {
   return async (dispatch, getState) => {
@@ -9,7 +9,7 @@ export function login(): TReduxThunk {
       connection: { wsClient },
     } = getState();
     const token = getToken();
-    const user = (await wsClient.request('login', token)).data as IPlayer;
+    const user = (await wsClient.request('login', token)).data as IUser;
     setToken(user.token);
     dispatch(userActions.createSetUser(user));
   };
@@ -21,7 +21,7 @@ export function startListenRefreshPlayerInfo(): TReduxThunk {
       connection: { wsClient },
     } = getState();
     wsClient.on('refreshPlayerInfo', msgData => {
-      const user = msgData as IPlayer;
+      const user = msgData as IUser;
       dispatch(userActions.createSetUser(user));
     });
   };

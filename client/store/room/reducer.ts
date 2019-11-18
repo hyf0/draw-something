@@ -1,9 +1,9 @@
+import { RoomStatus } from '@shared/constants/room';
+import { IGame, IRoom, IUser } from '@shared/types';
 import { produce } from 'immer';
 
 import { IAction } from '../actions';
 import { roomActionTypes } from '../actionTypes';
-import { IRoom, IPlayer, IGame } from '../../model/types';
-import { RoomStatus } from '@src/util/constants';
 
 export interface IReduxRoomState {
   roomList: IRoom[];
@@ -26,7 +26,7 @@ export default function roomReducer(state = defaultState, action: IAction) {
         break;
       case roomActionTypes.SET_CURRENT_ROOM_USERS:
         if (draft.currentRoom != null) {
-          draft.currentRoom.users = payload as IPlayer[];
+          draft.currentRoom.users = payload as IUser[];
         }
         break;
       case roomActionTypes.SET_ROOM:

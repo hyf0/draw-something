@@ -1,24 +1,22 @@
-import React, { useEffect, useCallback } from 'react';
+import './index.scss';
+
 import {
+  Button,
+  IconButton,
   List,
   ListItem,
   ListSubheader,
-  Button,
-  IconButton,
 } from '@material-ui/core';
 import { LoopOutlined as FreshIcon } from '@material-ui/icons';
-import { useDispatch, useSelector, shallowEqual } from 'react-redux';
-import { push } from 'connected-react-router';
-
-import { IReduxState } from '@src/store/reducers';
-import { roomEffects } from '@src/store/effects';
-import { IS_DEV, RoomStatus } from '@src/util/constants';
-import { IRoom } from '@src/model/types';
-
-import './index.scss';
+import { RoomStatus } from '@shared/constants/room';
+import { IRoom } from '@shared/types';
 import { roomActions } from '@src/store/actions';
-
-
+import { roomEffects } from '@src/store/effects';
+import { IReduxState } from '@src/store/reducers';
+import { IS_DEV } from '@src/util/constants';
+import { push } from 'connected-react-router';
+import React, { useCallback, useEffect } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
 const statusText = {
   [RoomStatus.GAMING]: '游戏中',
@@ -28,34 +26,31 @@ const statusText = {
 function RoomListItem({ room }: { room: IRoom }) {
   const dispatch = useDispatch();
   return (
-    <ListItem className="room-list-item-wrapper">
-      <div className="room-list-item">
-        <div className="room-list-item-header">
-          <div className="room-list-item-header-titie">
-            房间号: {String(room.id).padStart(5, '0')} - {room.name}
+      <div className="room-list-room">
+        <div className="room-name">{room.name}</div>
+        <div className="room-info">
+          <div className="room-number">
+            No.{String(room.id).padStart(5, '0')}
           </div>
-          <div className="room-list-item-status">{statusText[room.status]}</div>
+          <div className="room-status">{statusText[room.status]}</div>
         </div>
-        <div className="room-list-item-detail">
-          <div className="number-of-player">
-            玩家人数 {room.users.length} / {room.maxPlayerNumber}
-          </div>
-          <div className="room-list-item-operations">
-            <Button
-              onClick={() => dispatch(push(`/room/${room.id}`))}
-              className="join-in-button"
-              variant="outlined"
-            >
-              加入房间
-            </Button>
-          </div>
+        <div className="room-actions">
+          <Button
+            onClick={() => dispatch(push(`/room/${room.id}`))}
+            fullWidth
+            variant="outlined"
+          >
+            加入房间
+          </Button>
         </div>
       </div>
-    </ListItem>
   );
 }
 
-const selectorRoomList = ({ room: { roomList }, connection: { wsClient } }: IReduxState) => ({
+const selectorRoomList = ({
+  room: { roomList },
+  connection: { wsClient },
+}: IReduxState) => ({
   roomList,
   wsClient,
 });
@@ -82,8 +77,8 @@ export default function RoomList() {
 
     return () => {
       refreshRoomListOff();
-    }
-  }, [freshRoomList, wsClient]);
+    };
+  }, [dispatch, freshRoomList, wsClient]);
 
   return (
     <div className="room-list">
@@ -101,7 +96,11 @@ export default function RoomList() {
         {roomList.length === 0 ? (
           <div className="no-room-text">暂无公开房间</div>
         ) : (
-          roomList.map(room => <RoomListItem key={room.id} room={room} />)
+          <div className="room-list-content">
+            {roomList.map(room => (
+              <RoomListItem key={room.id} room={room} />
+            ))}
+          </div>
         )}
       </List>
     </div>

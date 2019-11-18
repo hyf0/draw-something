@@ -6,13 +6,3 @@ export const IS_DEV = getIsDevelopment();
 //     LOGIN = 'login',
 //     ROOM_LIST = 'roomList',
 // }
-
-export enum RoomStatus {
-  WAITING = 'waiting',
-  GAMING = 'gaming',
-};
-
-export enum RoomType {
-  PUBLIC = 'public',
-  PRIVATE = 'private',
-}
