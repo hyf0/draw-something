@@ -106,7 +106,7 @@ export default class RoomHandler {
       usersOfRoom.forEach(u => u.isGaming = true);
       const game = new Game(room, ctx.globals);
       room.status = RoomStatus.GAMING;
-      usersOfRoom.forEach(u => u.isGaming = false); // 重置user.isReady状态
+      usersOfRoom.forEach(u => u.isReady = false); // 重置user.isReady状态
 
       room.sendMessageToUsers({
         user,
@@ -128,7 +128,7 @@ export default class RoomHandler {
     });
 
     room.sendChattingMessageToUsers(
-      new ChattingMessage(`${user.username} 准备了`, {
+      new ChattingMessage(`${user.username} 已经准备`, {
         name: '你画我猜',
         id: 'game',
       }),
@@ -145,11 +145,11 @@ export default class RoomHandler {
       user,
       room,
     });
-    room.sendMessageToUsersButUser(
-      room,
-      'refreshRoomInfo',
-      user,
-      `${user.username} 取消准备了`,
+    room.sendChattingMessageToUsers(
+      new ChattingMessage(`${user.username} 取消了准备`, {
+        name: '你画我猜',
+        id: 'game',
+      }),
     );
   }
 }
