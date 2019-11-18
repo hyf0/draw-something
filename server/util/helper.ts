@@ -23,3 +23,12 @@ export function log(...args: unknown[]) {
 export function logError(...args: unknown[]) {
   console.error(`ERROR-${new Date().toLocaleTimeString()}:`, ...args);
 }
+
+export function randomIntBetween(start: number, toButNotIncluded: number):number {
+  start |= start;
+  toButNotIncluded |= toButNotIncluded;
+  if (toButNotIncluded < start) throw new Error(`toButNotIncluded: ${toButNotIncluded} is bigger than start: ${start}`);
+  const diff = toButNotIncluded - start;
+  const result = Math.floor(Math.random() * diff) + start;
+  return result;
+}
