@@ -13,3 +13,9 @@ if (IS_DEV_CLIENT) {
   ReactDOM.render(React.createElement(App), document.getElementById('root'));
 }
 
+(function() {
+  const bodyEl = document.querySelector('body') as HTMLBodyElement;
+  bodyEl.addEventListener('touchstart', evt => {
+    evt.preventDefault();
+  });
+}());

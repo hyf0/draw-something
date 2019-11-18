@@ -32,7 +32,10 @@ function App() {
 
 
   return (
-    <div className="App">
+    <div style={{
+      // height: '100vh',
+      // overflow: 'hidden',
+    }} className="App">
       <ConnectedRouter history={history}>
         <AppRoute />
       </ConnectedRouter>
