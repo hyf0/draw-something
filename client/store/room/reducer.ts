@@ -1,5 +1,5 @@
-import { RoomStatus } from '@shared/constants/room';
-import { IGame, IRoom, IUser } from '@shared/types';
+import { RoomStatus } from 'shared/constants/room';
+import { IGame, IRoom, IUser } from 'shared/types';
 import { produce } from 'immer';
 
 import { IAction } from '../actions';

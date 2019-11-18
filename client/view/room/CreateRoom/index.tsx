@@ -1,5 +1,8 @@
 import './index.scss';
 
+import { useDocumentTitle } from '@client/hooks';
+import { globalEffects, roomEffects } from '@client/store/effects';
+import { IReduxState } from '@client/store/reducers';
 import {
   AppBar,
   Button,
@@ -14,13 +17,10 @@ import {
   Typography,
 } from '@material-ui/core';
 import { ArrowBackOutlined as BackIcon } from '@material-ui/icons';
-import { RoomType } from '@shared/constants/room';
-import { useDocumentTitle } from '@src/hooks';
-import { globalEffects, roomEffects } from '@src/store/effects';
-import { IReduxState } from '@src/store/reducers';
 import { goBack } from 'connected-react-router';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { RoomType } from '../../../../shared/constants/room';
 
 const indexSelector = ({
   global: { numberOfOnlinePlayer },

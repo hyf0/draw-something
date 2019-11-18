@@ -1,7 +1,7 @@
 import { TReduxThunk } from '../effects';
 import { userActions } from '../actions';
 import { getToken, setToken } from '../../util/helper';
-import { IUser } from '@shared/types';
+import { IUser } from '../../../shared/types';
 
 export function login(): TReduxThunk {
   return async (dispatch, getState) => {

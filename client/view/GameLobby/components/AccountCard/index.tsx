@@ -14,17 +14,17 @@ import {
 import { MoreVert as MoreIcon } from '@material-ui/icons';
 import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 
-import { IReduxState } from '@src/store/reducers';
-import FullScreenLoading from '@src/ui/FullScreenLoading';
-import { userEffects } from '@src/store/effects';
-import { IS_DEV } from '@src/util/constants';
+import { IReduxState } from '@client/store/reducers';
+import FullScreenLoading from '@client/ui/FullScreenLoading';
+import { userEffects } from '@client/store/effects';
+import { IS_DEV_CLIENT } from '@client/util/constants';
 
 import './index.scss';
 
 const selectorAccountCard = ({ user: { user } }: IReduxState) => ({ user });
 
 export default function AccountCard() {
-  if (IS_DEV) {
+  if (IS_DEV_CLIENT) {
     console.log('render AccountCard');
   }
   const { user } = useSelector(selectorAccountCard, shallowEqual);

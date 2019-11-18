@@ -8,15 +8,16 @@ import {
   ListSubheader,
 } from '@material-ui/core';
 import { LoopOutlined as FreshIcon } from '@material-ui/icons';
-import { RoomStatus } from '@shared/constants/room';
-import { IRoom } from '@shared/types';
-import { roomActions } from '@src/store/actions';
-import { roomEffects } from '@src/store/effects';
-import { IReduxState } from '@src/store/reducers';
-import { IS_DEV } from '@src/util/constants';
+
+import { roomActions } from '@client/store/actions';
+import { roomEffects } from '@client/store/effects';
+import { IReduxState } from '@client/store/reducers';
+import { IS_DEV_CLIENT } from '@client/util/constants';
 import { push } from 'connected-react-router';
 import React, { useCallback, useEffect } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { IRoom } from '../../../../../shared/types';
+import { RoomStatus } from '../../../../../shared/constants/room';
 
 const statusText = {
   [RoomStatus.GAMING]: '游戏中',
@@ -56,7 +57,7 @@ const selectorRoomList = ({
 });
 
 export default function RoomList() {
-  if (IS_DEV) {
+  if (IS_DEV_CLIENT) {
     console.log('render RoomList');
   }
 

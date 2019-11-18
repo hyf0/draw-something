@@ -1,6 +1,6 @@
 import { IAction } from '../actions';
 import { userActionTypes } from '../actionTypes';
-import { IUser } from '@shared/types';
+import { IUser } from '../../../shared/types';
 
 export function createSetUsername(username: string): IAction {
   return {

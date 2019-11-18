@@ -1,5 +1,5 @@
 
-import { isRequestMessage } from '@shared/models/RequestMessage';
+import { isRequestMessage } from '../../shared/models/RequestMessage';
 
 import NodeWebsocket from 'ws';
 

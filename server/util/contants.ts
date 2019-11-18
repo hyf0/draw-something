@@ -1,3 +1,3 @@
 import { getIsDevelopment } from "./helper";
 
-export const IS_DEV = getIsDevelopment();
+export const IS_DEV_SERVER = getIsDevelopment();

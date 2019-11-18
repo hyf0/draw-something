@@ -1,7 +1,7 @@
 import { IconButton, Snackbar } from '@material-ui/core';
 import { Close as CloseIcon } from '@material-ui/icons';
-import { globalActions } from '@src/store/actions';
-import { IReduxState } from '@src/store/reducers';
+import { globalActions } from '@client/store/actions';
+import { IReduxState } from '@client/store/reducers';
 import React, { useCallback } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 

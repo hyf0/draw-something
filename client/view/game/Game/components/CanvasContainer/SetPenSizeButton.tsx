@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { IconButton, Popover, Slider } from '@material-ui/core';
 
-import PlainLine from '@src/ui/PlainLine';
+import PlainLine from '@client/ui/PlainLine';
 
 export default function SetPenSizeButton({
   anchorEl,

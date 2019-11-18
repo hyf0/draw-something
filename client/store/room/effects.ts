@@ -1,12 +1,11 @@
-import { push } from 'connected-react-router';
+import Notification, { NotificationType } from '@client/model/Notification';
+import { push, replace } from 'connected-react-router';
 import { batch as batchDispatch } from 'react-redux';
-import { replace } from 'connected-react-router';
 
+import { RoomStatus, RoomType } from '../../../shared/constants/room';
+import { IGame, IRoom, IUser } from '../../../shared/types';
+import { globalActions, roomActions, userActions } from '../actions';
 import { TReduxThunk } from '../effects';
-import { roomActions, userActions, globalActions } from '../actions';
-import { RoomStatus, RoomType } from '@shared/constants/room';
-import { IRoom, IUser, IGame } from '@shared/types';
-import Notification, { NotificationType } from '@src/model/Notification';
 
 export function getRoomList(): TReduxThunk {
   return async (dispatch, getState) => {

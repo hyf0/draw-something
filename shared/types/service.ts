@@ -1,4 +1,4 @@
-import { RoomStatus, RoomType } from '@shared/constants/room';
+import { RoomStatus, RoomType } from '../constants/room';
 
 export interface IUser {
   token: string;

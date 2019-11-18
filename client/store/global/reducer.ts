@@ -2,7 +2,7 @@ import { produce } from 'immer';
 
 import { IAction } from '../actions';
 import { globalActionTypes } from '../actionTypes';
-import Notification from '@src/model/Notification';
+import Notification from '@client/model/Notification';
 
 export interface IReduxGlobalState {
   numberOfOnlinePlayer: number;

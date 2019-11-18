@@ -1,12 +1,11 @@
-import ResponseMessage from '@shared/models/ResponseMessage';
-
+import { RoomStatus, RoomType } from '../../shared/constants/room';
+import ChattingMessage from '../../shared/models/ChattingMessage';
+import ResponseMessage from '../../shared/models/ResponseMessage';
+import { IRoom } from '../../shared/types';
 import { TGlobals } from '../globals';
-import { RoomStatus, RoomType } from '@shared/constants/room';
 import { createIncreaseIdGetter } from '../util/helper';
 import SenderService from './SenderService';
 import User from './User';
-import { IRoom } from '@shared/types';
-import ChattingMessage from '@shared/models/ChattingMessage';
 
 
 const getNextRoomId = createIncreaseIdGetter(1);

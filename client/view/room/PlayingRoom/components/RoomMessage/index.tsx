@@ -1,12 +1,12 @@
 import './index.scss';
 
 import { Button, List, ListItem, TextField } from '@material-ui/core';
-import { roomEffects } from '@src/store/effects';
-import { IReduxState } from '@src/store/reducers';
-import { createHandleOnKeyEnterUp } from '@src/util/helper';
+import { roomEffects } from '@client/store/effects';
+import { IReduxState } from '@client/store/reducers';
+import { createHandleOnKeyEnterUp } from '@client/util/helper';
 import React, { useCallback, useEffect, useState } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import ChattingMessage from '@shared/models/ChattingMessage';
+import ChattingMessage from '../../../../../../shared/models/ChattingMessage';
 
 const selectorRoomMessage = ({
   connection: { wsClient },

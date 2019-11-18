@@ -30,7 +30,7 @@ const eslint = require('eslint');
 const postcssNormalize = require('postcss-normalize');
 
 // custom
-
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 
@@ -318,8 +318,7 @@ module.exports = function(webpackEnv) {
         ...(modules.webpackAliases || {}),
 
         // custom
-        '@src': path.resolve(__dirname, '../client'),
-        '@shared': path.resolve(__dirname, '../shared'),
+        '@client': path.resolve(__dirname, '../client'),
         // '@share': path.resolve(__dirname, '../../share'),
         // ...(isEnvDevelopment && {
         //   'react-dom': '@hot-loader/react-dom', // webpack hot loader support
@@ -534,6 +533,7 @@ module.exports = function(webpackEnv) {
     },
     plugins: [
       // Generates an `index.html` file with the <script> injected.
+      isEnvProduction ? new BundleAnalyzerPlugin() : undefined,
       new ProgressBarPlugin(),
       new HtmlWebpackPlugin(
         Object.assign(

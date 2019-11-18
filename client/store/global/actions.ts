@@ -1,6 +1,6 @@
 import { IAction } from '../actions';
 import { globalActionTypes } from '../actionTypes';
-import Notification from '@src/model/Notification';
+import Notification from '@client/model/Notification';
 
 export function createSetNumberOfOnlinePlayer(num: number): IAction {
   return {

@@ -4,7 +4,7 @@ import { routerMiddleware } from 'connected-react-router';
 import ReduxThunk from 'redux-thunk';
 
 import createRootReducer from './reducers';
-import { IS_DEV } from '../util/constants';
+import { IS_DEV_CLIENT } from '../util/constants';
 
 export const history = createHashHistory();
 
@@ -12,7 +12,7 @@ const composeEnhancers =
   (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 export default function configureStore() {
-  if (IS_DEV) {
+  if (IS_DEV_CLIENT) {
     const store = createStore(
       createRootReducer(history), // root reducer with router state
       composeEnhancers(

@@ -1,11 +1,11 @@
 import NodeWebsocket from 'ws';
-import RequestMessage from '@shared/models/RequestMessage';
+import RequestMessage from '../../shared/models/RequestMessage';
 import { TGlobals } from '../globals';
 import handlers from '../handlers';
 import { parseRawMessage } from '../middleware/parseMessage';
 import HandlerContext from '../models/HandlerContext';
 import User from '../services/User';
-import { IS_DEV } from '../util/contants';
+import { IS_DEV_SERVER } from '../util/contants';
 import { log, logError } from '../util/helper';
 
 
@@ -24,7 +24,7 @@ export default class Connection {
 
   handlerMessage(rawMessage: NodeWebsocket.Data) {
     const reqMsg = parseRawMessage(rawMessage);
-    if (IS_DEV) {
+    if (IS_DEV_SERVER) {
       log(`reqeust ${reqMsg.handler}-${reqMsg.id}`, JSON.stringify(reqMsg.data, null, 2));
     }
 

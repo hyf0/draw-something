@@ -1,25 +1,18 @@
-import React, { TouchEvent, createRef } from 'react';
-
-import { IconButton } from '@material-ui/core';
-import {
-  Undo as UndoIcon,
-  Redo as RedoIcon,
-  RestoreFromTrash as ClearIcon,
-} from '@material-ui/icons';
-
-import CanvasController, {
-  ICanvasControllerSetting,
-} from '@src/controller/CanvasController';
-import Point from '@src/controller/Point';
-import WebsocketClient from '@src/WebsocketClient';
-import DrawAction, { DrawActionType } from '@src/model/DrawAction';
-// import RequestMessage from '@src/WebsocketClient/models/RequestMessage';
-
-import SetPenSizeButton from './SetPenSizeButton';
-import SetPenColorButton from './SetPenColorButton';
-
 import './Canvas.scss';
-import RequestMessage from '@shared/models/RequestMessage';
+
+import CanvasController, { ICanvasControllerSetting } from '@client/controller/CanvasController';
+import Point from '@client/controller/Point';
+import DrawAction, { DrawActionType } from '@client/model/DrawAction';
+import WebsocketClient from '@client/WebsocketClient';
+import { IconButton } from '@material-ui/core';
+import { Redo as RedoIcon, RestoreFromTrash as ClearIcon, Undo as UndoIcon } from '@material-ui/icons';
+import React, { createRef, TouchEvent } from 'react';
+
+import RequestMessage from '../../../../../../shared/models/RequestMessage';
+import SetPenColorButton from './SetPenColorButton';
+import SetPenSizeButton from './SetPenSizeButton';
+
+// import RequestMessage from '@client/WebsocketClient/models/RequestMessage';
 
 interface ICanvasState {
   futureDrawings: string[];

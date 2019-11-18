@@ -5,7 +5,7 @@ import {
   FiberManualRecord as CircleIcon,
 } from '@material-ui/icons';
 
-import CanvasController from '@src/controller/CanvasController';
+import CanvasController from '@client/controller/CanvasController';
 
 const colors = [
   '#000',

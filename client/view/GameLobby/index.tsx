@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 
-import { IReduxState } from '@src/store/reducers';
-import { globalEffects } from '@src/store/effects';
-import FullScreenLoading from '@src/ui/FullScreenLoading';
+import { IReduxState } from '@client/store/reducers';
+import { globalEffects } from '@client/store/effects';
+import FullScreenLoading from '@client/ui/FullScreenLoading';
 
 import RoomList from './components/RoomList';
 import AccountCard from './components/AccountCard';
 import GameLobbyHeader from './components/GameLobbyHeader';
 
 import './index.scss';
-import { useDocumentTitle } from '@src/hooks';
+import { useDocumentTitle } from '@client/hooks';
 
 const indexSelector = ({
   global: { numberOfOnlinePlayer },

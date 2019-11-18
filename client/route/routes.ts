@@ -1,9 +1,9 @@
-import GameLobby from "@src/view/GameLobby";
-import BasicLayout from "@src/layout/BasicLayout";
-import CreateRoom from "@src/view/room/CreateRoom";
-import PlayingRoom from "@src/view/room/PlayingRoom";
-import AuthLoyout from "@src/layout/AuthLayout";
-import Game from "@src/view/game/Game";
+import GameLobby from "@client/view/GameLobby";
+import BasicLayout from "@client/layout/BasicLayout";
+import CreateRoom from "@client/view/room/CreateRoom";
+import PlayingRoom from "@client/view/room/PlayingRoom";
+import AuthLoyout from "@client/layout/AuthLayout";
+import Game from "@client/view/game/Game";
 
 
 interface IRoute {

@@ -14,7 +14,7 @@ import { SearchOutlined as SearchIcon} from '@material-ui/icons';
 import { useDispatch } from 'react-redux';
 import { push } from 'connected-react-router';
 
-import { createHandleOnKeyEnterUp } from '@src/util/helper';
+import { createHandleOnKeyEnterUp } from '@client/util/helper';
 
 
 const GameLobbyHeader = React.memo(function GameLobbyHeader () {

@@ -1,6 +1,6 @@
-import { IS_DEV } from '../util/constants';
-import ResponseMessage from '@shared/models/ResponseMessage';
-import RequestMessage from '@shared/models/RequestMessage';
+import { IS_DEV_CLIENT } from '../util/constants';
+import ResponseMessage from '../../shared/models/ResponseMessage';
+import RequestMessage from '../../shared/models/RequestMessage';
 // import RequestMessage from './models/RequestMessage';
 
 export default class WebsocketClient {
@@ -33,7 +33,7 @@ export default class WebsocketClient {
       this.isConnected = false;
       if (typeof this.options.onclose === 'function') {
         this.options.onclose(evt);
-        if (IS_DEV) {
+        if (IS_DEV_CLIENT) {
           console.log('连接断开');
         }
       }
@@ -104,7 +104,7 @@ export default class WebsocketClient {
           if (respMsg.requestId != null) {
             this.off(respMsg.requestId);
           }
-          if (IS_DEV) {
+          if (IS_DEV_CLIENT) {
             if (respMsg.requestId != null && respMsg.requestId !== reqMsg.id) {
               console.error(
                 `reqMsg.id: ${reqMsg.id} !== respMsg.requestId： ${respMsg.requestId}`,

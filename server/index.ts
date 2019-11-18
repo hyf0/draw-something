@@ -1,12 +1,15 @@
+// import 'module-alias/register'; // 用于解决ts编译器不编译alias的问题
 import NodeWebsocket from 'ws';
-import { IS_DEV } from './util/contants';
-import { serverConfig } from './config';
 
+import { serverConfig } from './config';
 import Connection from './controllers/Connection';
 import globals from './globals';
+import { IS_DEV_SERVER } from './util/contants';
 import { log } from './util/helper';
 
-if (IS_DEV) {
+
+
+if (IS_DEV_SERVER) {
   log('正处于开发模式中');
 }
 

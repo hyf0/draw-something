@@ -1,23 +1,13 @@
-{
+{ // 这个配置文件用于vscode编辑器，并非编译时的文件
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "target": "ESNEXT",
     "module": "UMD",
-    "baseUrl": ".",
+    "baseUrl": "./",                       /* Base directory to resolve non-absolute module names. */
     "paths": {
-      "@shared/*": ["./shared/*"],
-      "@src/*": ["./client/*"],
+      "@client/*": ["./client/*"]
     },
-    "outDir": "./dist",
     "jsx": "preserve",
-    "strict": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "strictFunctionTypes": true,
-    "strictBindCallApply": true,
-    "strictPropertyInitialization": true,
-    "noImplicitThis": true,
-    "alwaysStrict": true,
-    "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
     "allowJs": true,
     "skipLibCheck": true,
@@ -28,8 +18,8 @@
     "noEmit": true
   },
   "include": [
-    "shared",
     "client",
     "server",
+    "shared"
   ]
 }

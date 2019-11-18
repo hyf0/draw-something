@@ -1,8 +1,8 @@
+import ChattingMessage from '../../shared/models/ChattingMessage';
+import ResponseMessage from '../../shared/models/ResponseMessage';
 import DrawAction from '../models/DrawAction';
 import HandlerContext from '../models/HandlerContext';
-import SenderService from 'server/services/SenderService';
-import ResponseMessage from '@shared/models/ResponseMessage';
-import ChattingMessage from '@shared/models/ChattingMessage';
+import SenderService from '../services/SenderService';
 
 export default class GameHandler {
   static getGame(ctx: HandlerContext) {

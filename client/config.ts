@@ -1,7 +1,7 @@
-import { IS_DEV } from "./util/constants";
+import { IS_DEV_CLIENT } from "./util/constants";
 
 function getConfig() {
-    if (IS_DEV) {
+    if (IS_DEV_CLIENT) {
         return {
             addr: 'ws://127.0.0.1:9421',
             // addr: 'ws://192.168.137.1:9421',

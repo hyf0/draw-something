@@ -4,7 +4,7 @@ import uuidv4 from 'uuid/v4';
 import DataService from './DataService';
 import { TGlobals } from '../globals';
 import { log } from '../util/helper';
-import { IUser } from '@shared/types';
+import { IUser } from '../../shared/types';
 
 export default class User {
   public token = uuidv4();

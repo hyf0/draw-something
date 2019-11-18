@@ -1,7 +1,7 @@
-import { IS_DEV } from "./util/contants";
+import { IS_DEV_SERVER } from "./util/contants";
 
 function getServerConfig() {
-    if (IS_DEV) return {
+    if (IS_DEV_SERVER) return {
         port: 9421,
     }
     return {

@@ -1,9 +1,9 @@
 import DataService from './DataService';
 import { TGlobals } from '../globals';
 import Room from './Room';
-import { IGame } from '@shared/types';
+import { IGame } from '../../shared/types';
 import User from './User';
-import { RoomStatus } from '@shared/constants/room';
+import { RoomStatus } from '../../shared/constants/room';
 
 function createKeyword(arg: [string, string]) {
   return {

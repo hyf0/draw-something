@@ -1,18 +1,18 @@
 import './index.scss';
 
+import { roomActions, userActions } from '@client/store/actions';
+import { roomEffects } from '@client/store/effects';
+import { IReduxState } from '@client/store/reducers';
+import AvatarBox from '@client/ui/AvatarBox';
+import FullScreenLoading from '@client/ui/FullScreenLoading';
 import { AppBar, Toolbar, Typography } from '@material-ui/core';
-import { roomEffects } from '@src/store/effects';
-import { IReduxState } from '@src/store/reducers';
-import AvatarBox from '@src/ui/AvatarBox';
-import FullScreenLoading from '@src/ui/FullScreenLoading';
 import React, { useEffect, useMemo, useState } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import ChattingMessage from 'shared/models/ChattingMessage';
+import { IGame, IUser } from 'shared/types';
 
 import AnswerInputBox from './components/AnswerInputBox';
 import CanvasContainer from './components/CanvasContainer';
-import ChattingMessage from '@shared/models/ChattingMessage';
-import { roomActions, userActions } from '@src/store/actions';
-import { IGame, IUser } from '@shared/types';
 
 const selectorGame = ({
   room: { currentGame },
