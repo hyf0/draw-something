@@ -80,7 +80,7 @@ export default class CanvasController {
   }
 
   getSnapshot() {
-    return this.canvasEl.toDataURL('image/jpeg');
+    return this.canvasEl.toDataURL('image/jpeg', 1);
   }
 
   startDrawLine(startPoint: Point) {

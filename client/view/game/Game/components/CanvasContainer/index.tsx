@@ -249,6 +249,7 @@ export default class Canvas extends React.PureComponent<
   // -- end 辅助函数
 
   handleTouchStart = (evt: TouchEvent) => {
+    // evt.preventDefault();
     this.snapshotCurrentDrawing();
 
     const p = this.getPointFromEvent(evt);
@@ -258,11 +259,13 @@ export default class Canvas extends React.PureComponent<
   };
 
   handleTouchMove = (evt: TouchEvent) => {
+    // evt.preventDefault();
     const p = this.getPointFromEvent(evt);
     this.drawLineTo(p);
   };
 
   handleTouchEnd = (evt: TouchEvent) => {
+    // evt.preventDefault();
     this.endDrawing();
   };
 

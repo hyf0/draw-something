@@ -13,9 +13,12 @@ if (IS_DEV_CLIENT) {
   ReactDOM.render(React.createElement(App), document.getElementById('root'));
 }
 
-(function() {
+(function() { // 禁止手机浏览器下拉刷新的效果
   const bodyEl = document.querySelector('body') as HTMLBodyElement;
-  bodyEl.addEventListener('touchstart', evt => {
+  bodyEl.addEventListener('touchmove', evt => {
+    console.log('touchstart');
     evt.preventDefault();
+  }, {
+    passive: false,
   });
 }());
