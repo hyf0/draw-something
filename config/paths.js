@@ -76,7 +76,7 @@ module.exports = {
   appPackageJson: resolveApp('package.json'),
   appSrc: resolveApp('client'),
   shared: resolveApp('shared'),
-  appTsConfig: resolveApp('tsconfig.client.json'),
+  appTsConfig: resolveApp('./client/tsconfig.json'),
   // appTsConfig: resolveApp('tsconfig.json'),
   appJsConfig: resolveApp('jsconfig.json'),
   yarnLockFile: resolveApp('yarn.lock'),

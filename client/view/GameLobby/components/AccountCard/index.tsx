@@ -40,9 +40,10 @@ export default function AccountCard() {
   // -- 更改用户名相关逻辑
   const [isShowChangeNameDialog, setIsShowChangeNameDialog] = useState(false);
   const dispatch = useDispatch();
-  const openChangeNameModal = useCallback(() => setIsShowChangeNameDialog(true), [
-    setIsShowChangeNameDialog,
-  ]);
+  const openChangeNameModal = useCallback(
+    () => setIsShowChangeNameDialog(true),
+    [setIsShowChangeNameDialog],
+  );
   const closeChangeName = useCallback(() => setIsShowChangeNameDialog(false), [
     setIsShowChangeNameDialog,
   ]);
@@ -71,14 +72,21 @@ export default function AccountCard() {
           />
         </DialogContent>
         <DialogActions>
-          <Button disabled={changedUsername.trim().length === 0} onClick={confirmChangeUsername}>确定</Button>
+          <Button
+            disabled={changedUsername.trim().length === 0}
+            onClick={confirmChangeUsername}
+          >
+            确定
+          </Button>
           <Button onClick={closeChangeName}>取消</Button>
         </DialogActions>
       </Dialog>
       <div className="user-info">
         <Card>
           <CardHeader
-            title={`你好，${user.username}！`}
+            title={
+              <span style={{ color: '#000' }}>你好，{user.username}！</span>
+            }
             subheader={`登陆于${new Date().toLocaleTimeString()}`}
             avatar={<Avatar>{user.username[0]}</Avatar>}
             action={

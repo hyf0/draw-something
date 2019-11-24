@@ -99,15 +99,14 @@ export default class CanvasController {
 
   mount(elementSelector: string) {
     const el = document.querySelector(elementSelector);
-    (window as any).el = el;
-    console.log(el, elementSelector);
+    // (window as any).el = el;
     if (el != null) {
       el.append(this.canvasEl);
       this.canvasEl.height = el.clientHeight;
       this.canvasEl.width = el.clientWidth;
       this.clearCanvas();
     } else {
-      throw new Error(`无法通过 ${elementSelector} 找到相应的元素，请确定选择器书写正确`);
+      throw new Error(`无法通过 ${elementSelector} 找到相应的元素，请确定选择器书写正确，或元素确实存在`);
     }
   }
 

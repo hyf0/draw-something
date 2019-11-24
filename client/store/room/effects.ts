@@ -1,4 +1,5 @@
-import Notification, { NotificationType } from '@client/model/Notification';
+import Notification  from '@client/model/Notification';
+import wsClient from '@client/WebsocketClient/wsClient';
 import { push, replace } from 'connected-react-router';
 import { batch as batchDispatch } from 'react-redux';
 
@@ -8,10 +9,7 @@ import { globalActions, roomActions, userActions } from '../actions';
 import { TReduxThunk } from '../effects';
 
 export function getRoomList(): TReduxThunk {
-  return async (dispatch, getState) => {
-    const {
-      connection: { wsClient },
-    } = getState();
+  return async dispatch => {
     try {
       const respMsg = await wsClient.request('roomList');
       const result = respMsg.data as any[];
@@ -24,15 +22,13 @@ export function getRoomList(): TReduxThunk {
 
 let isEnteringRoom = false;
 export function enterRoom(roomId: number): TReduxThunk {
-  return async (dispatch, getState) => {
+  return async dispatch => {
     if (isEnteringRoom) return;
     isEnteringRoom = true;
-    const {
-      connection: { wsClient },
-    } = getState();
+
     try {
       const respMsg = await wsClient.request('userEnter', {
-        id: roomId,
+        roomId,
       });
 
       const { room, user } = respMsg.data as {
@@ -45,8 +41,11 @@ export function enterRoom(roomId: number): TReduxThunk {
         dispatch(push(`/room/${room.id}`));
       });
     } catch (err) {
-      dispatch(push('/'));
-      console.error(err);
+      batchDispatch(() => {
+        dispatch(push('/'));
+        dispatch(globalActions.createAddNotification(new Notification(err.title, 'error')))
+      });
+
     } finally {
       isEnteringRoom = false;
     }
@@ -56,7 +55,6 @@ export function enterRoom(roomId: number): TReduxThunk {
 export function leaveRoom(): TReduxThunk {
   return async (dispatch, getState) => {
     const {
-      connection: { wsClient },
       user: { user },
     } = getState();
     if (user == null || user.currentRoomId == null) return;
@@ -72,10 +70,7 @@ export function leaveRoom(): TReduxThunk {
 }
 
 export function createRoom(name: string, type: RoomType): TReduxThunk {
-  return async (dispatch, getState) => {
-    const {
-      connection: { wsClient },
-    } = getState();
+  return async dispatch => {
     try {
       const respMsg = await wsClient.request('createRoom', {
         name,
@@ -91,10 +86,7 @@ export function createRoom(name: string, type: RoomType): TReduxThunk {
 }
 
 export function sendChatMessage(content: string): TReduxThunk {
-  return async (dispatch, getState) => {
-    const {
-      connection: { wsClient },
-    } = getState();
+  return async dispatch => {
     try {
       wsClient.request('sendChatMessage', { content });
     } catch (err) {
@@ -105,10 +97,7 @@ export function sendChatMessage(content: string): TReduxThunk {
 
 export function makeGameIsReady(ready: boolean): TReduxThunk {
   const requestType = ready ? 'makeGameReady' : 'cancelGameReady';
-  return async (dispatch, getState) => {
-    const {
-      connection: { wsClient },
-    } = getState();
+  return async dispatch => {
     try {
       const respMsg = await wsClient.request(requestType);
       const { user, room } = respMsg.data as {
@@ -126,7 +115,6 @@ export function makeGameIsReady(ready: boolean): TReduxThunk {
 export function getGame(): TReduxThunk {
   return async (dispatch, getState) => {
     const {
-      connection: { wsClient },
       user: { user },
     } = getState();
     try {
@@ -140,7 +128,7 @@ export function getGame(): TReduxThunk {
     } catch (err) {
       dispatch(
         globalActions.createAddNotification(
-          new Notification(err.title, undefined, NotificationType.ERROR),
+          new Notification(err.title, 'error'),
         ),
       );
       if (user != null && user.currentRoomId != null) {

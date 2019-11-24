@@ -3,330 +3,288 @@ import './Canvas.scss';
 import CanvasController, { ICanvasControllerSetting } from '@client/controller/CanvasController';
 import Point from '@client/controller/Point';
 import DrawAction, { DrawActionType } from '@client/model/DrawAction';
-import WebsocketClient from '@client/WebsocketClient';
 import { IconButton } from '@material-ui/core';
 import { Redo as RedoIcon, RestoreFromTrash as ClearIcon, Undo as UndoIcon } from '@material-ui/icons';
-import React, { createRef, TouchEvent } from 'react';
+import React, { TouchEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
+import { ReservedEventName } from '../../../../../../shared/constants';
 import RequestMessage from '../../../../../../shared/models/RequestMessage';
+import wsClient from '../../../../../WebsocketClient/wsClient';
 import SetPenColorButton from './SetPenColorButton';
 import SetPenSizeButton from './SetPenSizeButton';
-import { roomActions } from '@client/store/actions';
-import { IGame } from 'shared/types';
 
 // import RequestMessage from '@client/WebsocketClient/models/RequestMessage';
 
-interface ICanvasState {
-  futureDrawings: string[];
-  pastDrawings: string[];
-  penColor: string;
-  penSize: number;
+function sendDrawActionToServer(
+  type: DrawActionType,
+  payload?: unknown,
+  extral?: { newestDrawing?: string },
+) {
+  const drawAction = new DrawAction(type, payload);
+  const reqMsg = new RequestMessage(
+    {
+      drawAction,
+      ...(extral !== undefined ? extral : {}),
+    },
+    'drawAction',
+  );
+  wsClient.sendMessage(reqMsg);
 }
 
-export default class Canvas extends React.PureComponent<
-  {
-    isSelfPlaying: boolean;
-    wsClient: WebsocketClient;
-    initialDrawing?: string;
-  },
-  ICanvasState
-> {
-  state: ICanvasState = {
-    futureDrawings: [],
-    pastDrawings: [],
-    penColor: '#000',
-    penSize: 1,
+function getPointFromEvent(evt: TouchEvent): Point {
+  // 获得相对画布左上角的坐标
+  const { touches, target } = evt;
+  const t = touches[0];
+  const { clientX, clientY } = t;
+  const result = {
+    x: clientX - (target as HTMLCanvasElement).offsetLeft,
+    y: clientY - (target as HTMLCanvasElement).offsetTop,
   };
-  posElRef = createRef<HTMLDivElement>();
-  draw = new CanvasController();
-  // warn 维持一个currentDrawing变量,每次都调用toDataUrl是非常消耗性能的操作
+  return result;
+}
+
+function Canvas({
+  isSelfPlaying,
+  initialDrawing,
+}: {
+  isSelfPlaying: boolean;
+  initialDrawing?: string;
+}) {
+  const drawRef = useRef(new CanvasController());
+  const draw = drawRef.current;
+  const [futureDrawings, setFutureDrawings] = useState<string[]>([]);
+  const [pastDrawings, setPastDrawings] = useState<string[]>([]);
+  const [penColor, setPenColor] = useState('#000');
+  const [penSize, setPenSize] = useState(1);
+  const isMountedRef = useRef(false);
 
   // 生命周期
 
-  //
-  changePlayingUserOff: undefined | (() => void);
-  drawActionOff: undefined | (() => void);
-
-  componentDidMount() {
-    this.draw.mount('#id-canvas');
-    this.bindEvents();
-    const { initialDrawing } = this.props;
-    if (initialDrawing !== undefined) {
-      this.draw.drawImage(initialDrawing);
-    }
-  }
-
-  componentWillUnmount() {
-    this.changePlayingUserOff && this.changePlayingUserOff();
-    this.drawActionOff && this.drawActionOff();
-  }
-
-  bindEvents() {
-    const { wsClient } = this.props;
-    const { draw } = this;
-    this.changePlayingUserOff = wsClient.on('changePlayingUser', () => { // 清除别人在画布上的东西
-      this.clearCanvas();
-      this.setState({
-        futureDrawings: [],
-        pastDrawings: [],
-      });
-    });
-
-    this.drawActionOff = wsClient.on('drawAction', respMsgData => {
-      // if (!this.props.isSelfPlaying) return; // 不能写上面，闭包导致无法取得变量最新值
-      const drawAction = respMsgData as DrawAction;
-      const { type, payload } = drawAction;
-      switch (type) {
-        case DrawActionType.START_DRAW_LINE:
-          {
-            const { point, setting } = payload as {
-              point: Point;
-              setting?: ICanvasControllerSetting;
-            };
-            let prevSetting = draw.getSetting();
-            if (setting != null) draw.setting(setting);
-            draw.drawPoint(point);
-            draw.startDrawLine(point);
-            draw.setting(prevSetting);
-          }
-          break;
-        case DrawActionType.DRAW_LINE_TO:
-          {
-            const { point, setting } = payload as {
-              point: Point;
-              setting?: ICanvasControllerSetting;
-            };
-            let prevSetting = draw.getSetting();
-            if (setting != null) draw.setting(setting);
-            draw.drawLineTo(point);
-            draw.setting(prevSetting);
-          }
-          break;
-        case DrawActionType.CLEAR_CANVAS:
-          draw.clearCanvas();
-          break;
-        case DrawActionType.DRAW_IMAGE:
-          {
-            const imgData = payload as string;
-            draw.drawImage(imgData);
-          }
-          break;
+  useLayoutEffect(() => {
+    if (isMountedRef.current === false) {
+      draw.mount('#id-canvas');
+      if (initialDrawing !== undefined) {
+        draw.drawImage(initialDrawing);
       }
-    });
-  }
-
-  // -- end 生命周期
-
-  // 辅助函数
-
-  sendDrawActionToServer(
-    type: DrawActionType,
-    payload?: unknown,
-    extral?: { newestDrawing?: string },
-  ) {
-    const { wsClient, isSelfPlaying } = this.props;
-    if (!isSelfPlaying) return;
-    const drawAction = new DrawAction(type, payload);
-    const reqMsg = new RequestMessage(
-      {
-        drawAction,
-        ...(extral !== undefined ? extral : {}),
-      },
-      'drawAction',
-    );
-    wsClient.sendMessage(reqMsg);
-  }
-
-  getPointFromEvent = (evt: TouchEvent): Point => {
-    // 获得相对画布左上角的坐标
-    const { touches, target } = evt;
-    const t = touches[0];
-    const { clientX, clientY } = t;
-    const result = {
-      x: clientX - (target as HTMLCanvasElement).offsetLeft,
-      y: clientY - (target as HTMLCanvasElement).offsetTop,
-    };
-    return result;
-  };
-
-  // 画画相关
-
-  snapshotCurrentDrawing() {
-    const curDrawing = this.draw.getSnapshot();
-    this.setState(prevState => ({
-      pastDrawings: prevState.pastDrawings.concat(curDrawing),
-    }));
-  }
-
-  startDrawLine(p: Point) {
-    const { draw } = this;
-    const { futureDrawings } = this.state;
-    if (futureDrawings.length !== 0) {
-      this.setState({
-        futureDrawings: [],
-      });
+      isMountedRef.current = true;
     }
+  }, [draw, initialDrawing]);
 
-    draw.drawPoint(p);
-    draw.startDrawLine(p);
+  useEffect(() => {
+    const changePlayingUserOff = wsClient.on(
+      ReservedEventName.CHANGE_DRAWER,
+      () => {
+        // 清除别人在画布上的东西
+        draw.clearCanvas();
+        setFutureDrawings([]);
+        setPastDrawings([]);
+      },
+    );
 
-    this.sendDrawActionToServer(DrawActionType.START_DRAW_LINE, {
-      point: p,
-      setting: draw.getSetting(),
+    const drawActionOff = wsClient.on(
+      ReservedEventName.DRAW_ACTION,
+      respMsgData => {
+        const drawAction = respMsgData as DrawAction;
+        const { type, payload } = drawAction;
+        switch (type) {
+          case DrawActionType.START_DRAW_LINE:
+            {
+              const { point, setting } = payload as {
+                point: Point;
+                setting?: ICanvasControllerSetting;
+              };
+              let prevSetting = draw.getSetting();
+              if (setting != null) draw.setting(setting);
+              draw.drawPoint(point);
+              draw.startDrawLine(point);
+              draw.setting(prevSetting);
+            }
+            break;
+          case DrawActionType.DRAW_LINE_TO:
+            {
+              const { point, setting } = payload as {
+                point: Point;
+                setting?: ICanvasControllerSetting;
+              };
+              let prevSetting = draw.getSetting();
+              if (setting != null) draw.setting(setting);
+              draw.drawLineTo(point);
+              draw.setting(prevSetting);
+            }
+            break;
+          case DrawActionType.CLEAR_CANVAS:
+            draw.clearCanvas();
+            break;
+          case DrawActionType.DRAW_IMAGE:
+            {
+              const imgData = payload as string;
+              draw.drawImage(imgData);
+            }
+            break;
+        }
+      },
+    );
+    return () => {
+      changePlayingUserOff();
+      drawActionOff();
+    };
+  }, [draw, setFutureDrawings, setPastDrawings]);
+
+  // 绘图相关
+
+  const snapshotCurrentDrawing = useCallback(() => {
+    const curDrawing = draw.getSnapshot();
+    setPastDrawings(prev => prev.concat(curDrawing));
+  }, [draw]);
+
+  const startDrawLine = useCallback(
+    (p: Point) => {
+      if (futureDrawings.length !== 0) {
+        setFutureDrawings([]);
+      }
+      draw.drawPoint(p);
+      draw.startDrawLine(p);
+
+      sendDrawActionToServer(DrawActionType.START_DRAW_LINE, {
+        point: p,
+        setting: draw.getSetting(),
+      });
+    },
+    [draw, futureDrawings, setFutureDrawings],
+  );
+
+  const drawLineTo = useCallback(
+    (to: Point) => {
+      draw.drawLineTo(to);
+      sendDrawActionToServer(DrawActionType.DRAW_LINE_TO, {
+        point: to,
+        setting: draw.getSetting(),
+      });
+    },
+    [draw],
+  );
+
+  const clearCanvas = useCallback(() => {
+    snapshotCurrentDrawing();
+
+    draw.clearCanvas();
+    sendDrawActionToServer(DrawActionType.CLEAR_CANVAS, {
+      newestDrawing: draw.getSnapshot(),
     });
-  }
+  }, [draw, snapshotCurrentDrawing]);
 
-  drawLineTo(to: Point) {
-    const { draw } = this;
-    draw.drawLineTo(to);
-
-    this.sendDrawActionToServer(DrawActionType.DRAW_LINE_TO, {
-      point: to,
-      setting: draw.getSetting(),
-    });
-  }
-
-  endDrawing = () => {
-    this.sendDrawActionToServer(DrawActionType.END_DRAW_LINE, undefined, {
-      newestDrawing: this.draw.getSnapshot(),
-    });
-  };
-
-  clearCanvas = () => {
-    this.snapshotCurrentDrawing();
-
-    this.draw.clearCanvas();
-    this.sendDrawActionToServer(DrawActionType.CLEAR_CANVAS, {
-      newestDrawing: this.draw.getSnapshot(),
-    });
-  };
-
-  undoDrawing = () => {
-    const { draw } = this;
-    const { pastDrawings, futureDrawings } = this.state;
+  const undoDrawing = useCallback(() => {
     if (pastDrawings.length === 0) return;
     const pastDrawing = pastDrawings.pop() as string;
     draw.drawImage(pastDrawing);
-
-    this.setState({
-      pastDrawings: [...pastDrawings],
-      futureDrawings: [...futureDrawings, draw.getSnapshot()],
-    });
-
-    this.sendDrawActionToServer(DrawActionType.DRAW_IMAGE, pastDrawing, {
+    setPastDrawings([...pastDrawings]);
+    setFutureDrawings([...futureDrawings, draw.getSnapshot()]);
+    sendDrawActionToServer(DrawActionType.DRAW_IMAGE, pastDrawing, {
       newestDrawing: pastDrawing,
     });
-  };
+  }, [pastDrawings, futureDrawings, draw, setPastDrawings, setFutureDrawings]);
 
-  redoDrawing = () => {
-    const { draw } = this;
-    const { pastDrawings, futureDrawings } = this.state;
+  const redoDrawing = useCallback(() => {
     if (futureDrawings.length === 0) return;
 
     const futureDrawing = futureDrawings.pop() as string;
     draw.drawImage(futureDrawing);
-
-    this.setState({
-      pastDrawings: [...pastDrawings, draw.getSnapshot()],
-      futureDrawings: [...futureDrawings],
-    });
-
-    this.sendDrawActionToServer(DrawActionType.DRAW_IMAGE, futureDrawing, {
+    setPastDrawings([...pastDrawings, draw.getSnapshot()]);
+    setFutureDrawings([...futureDrawings]);
+    sendDrawActionToServer(DrawActionType.DRAW_IMAGE, futureDrawing, {
       newestDrawing: futureDrawing,
     });
-  };
+  }, [pastDrawings, futureDrawings, draw, setFutureDrawings, setPastDrawings]);
 
-  setPenColor = (penColor: string) => {
-    this.draw.penColor = penColor;
-    this.setState({ penColor });
-  };
+  // event handler
 
-  setPenSize = (penSize: number) => {
-    this.draw.penSize = penSize;
-    this.setState({ penSize });
-  };
+  const handleTouchStart = useCallback(
+    (evt: TouchEvent) => {
+      snapshotCurrentDrawing();
 
-  // -- end 辅助函数
+      const p = getPointFromEvent(evt);
+      startDrawLine(p);
+    },
+    [snapshotCurrentDrawing, startDrawLine],
+  );
 
-  handleTouchStart = (evt: TouchEvent) => {
-    // evt.preventDefault();
-    this.snapshotCurrentDrawing();
+  const handleTouchMove = useCallback(
+    (evt: TouchEvent) => {
+      const p = getPointFromEvent(evt);
+      drawLineTo(p);
+    },
+    [drawLineTo],
+  );
 
-    const p = this.getPointFromEvent(evt);
-    this.startDrawLine(p);
+  const handleTouchEnd = useCallback(() => {
+    sendDrawActionToServer(DrawActionType.END_DRAW_LINE, undefined, {
+      newestDrawing: draw.getSnapshot(),
+    }); // 同步最新画作到服务器上
+  }, [draw]);
 
-    // this.startDrawLine(this.getPointFromEvent(evt));
-  };
+  const [posDivEl, setPosDivEl] = useState<HTMLDivElement | null>(null);
 
-  handleTouchMove = (evt: TouchEvent) => {
-    // evt.preventDefault();
-    const p = this.getPointFromEvent(evt);
-    this.drawLineTo(p);
-  };
-
-  handleTouchEnd = (evt: TouchEvent) => {
-    // evt.preventDefault();
-    this.endDrawing();
-  };
-
-  render() {
-    const { isSelfPlaying } = this.props;
-    const { futureDrawings, pastDrawings, penColor, penSize } = this.state;
-    const { draw, setPenColor, setPenSize } = this;
-    return (
-      <div>
-        <div className="canvas-wrapper">
-          <div
-            id="id-canvas"
-            style={{
-              width: 375,
-              height: 300,
-            }}
-            onTouchStart={isSelfPlaying ? this.handleTouchStart : undefined}
-            onTouchMove={isSelfPlaying ? this.handleTouchMove : undefined}
-            onTouchEnd={isSelfPlaying ? this.handleTouchEnd : undefined}
-          />
-        </div>
-        {!isSelfPlaying ? null : (
-          <div ref={this.posElRef} className="game-canvas-operations">
-            <SetPenColorButton
-              anchorEl={this.posElRef.current}
-              draw={draw}
-              penColor={penColor}
-              setPenColor={setPenColor}
-            />
-            <SetPenSizeButton
-              penSize={penSize}
-              penColor={penColor}
-              setPenSize={setPenSize}
-              anchorEl={this.posElRef.current}
-            />
-            <IconButton
-              disabled={pastDrawings.length === 0}
-              onClick={this.undoDrawing}
-              style={{ flex: '1' }}
-              className="canvas-operation-list-item"
-            >
-              <UndoIcon fontSize="large" />
-            </IconButton>
-            <IconButton
-              disabled={futureDrawings.length === 0}
-              style={{ flex: '1' }}
-              onClick={this.redoDrawing}
-              className="canvas-operation-list-item"
-            >
-              <RedoIcon fontSize="large" />
-            </IconButton>
-            <IconButton
-              style={{ flex: '1', color: '#000' }}
-              className="canvas-operation-list-item"
-              onClick={this.clearCanvas}
-            >
-              <ClearIcon fontSize="large" />
-            </IconButton>
-          </div>
-        )}
+  return (
+    <div>
+      <div className="canvas-wrapper">
+        <div
+          id="id-canvas"
+          style={{
+            width: 375,
+            height: 300,
+          }}
+          onTouchStart={isSelfPlaying ? handleTouchStart : undefined}
+          onTouchMove={isSelfPlaying ? handleTouchMove : undefined}
+          onTouchEnd={isSelfPlaying ? handleTouchEnd : undefined}
+        />
       </div>
-    );
-  }
+      {!isSelfPlaying ? null : (
+        <div ref={ref => setPosDivEl(ref)} className="game-canvas-operations">
+          <SetPenColorButton
+            anchorEl={posDivEl}
+            draw={draw}
+            penColor={penColor}
+            setPenColor={(color: string) => {
+              draw.penColor = color;
+              setPenColor(color);
+            }}
+          />
+          <SetPenSizeButton
+            penSize={penSize}
+            penColor={penColor}
+            setPenSize={(size: number) => {
+              draw.penSize = size;
+              setPenSize(size);
+            }}
+            anchorEl={posDivEl}
+          />
+          <IconButton
+            disabled={pastDrawings.length === 0}
+            onClick={undoDrawing}
+            style={{ flex: '1' }}
+            className="canvas-operation-list-item"
+          >
+            <UndoIcon fontSize="large" />
+          </IconButton>
+          <IconButton
+            disabled={futureDrawings.length === 0}
+            style={{ flex: '1' }}
+            onClick={redoDrawing}
+            className="canvas-operation-list-item"
+          >
+            <RedoIcon fontSize="large" />
+          </IconButton>
+          <IconButton
+            style={{ flex: '1', color: '#000' }}
+            className="canvas-operation-list-item"
+            onClick={clearCanvas}
+          >
+            <ClearIcon fontSize="large" />
+          </IconButton>
+        </div>
+      )}
+    </div>
+  );
 }
+
+export default React.memo(Canvas);

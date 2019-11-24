@@ -127,7 +127,7 @@ export default class WebsocketClient {
     callback: (messageData: unknown, message: ResponseMessage) => void,
   ) {
     let cbsArray = this.eventMap.get(eventName);
-    if (cbsArray == undefined) {
+    if (cbsArray === undefined) {
       cbsArray = [];
       this.eventMap.set(eventName, cbsArray);
     }
@@ -141,7 +141,7 @@ export default class WebsocketClient {
     cb: (messageData: unknown, message: RequestMessage) => void,
   ) {
     let cbsArray = this.eventMap.get(eventName);
-    if (cbsArray != undefined) {
+    if (cbsArray !== undefined) {
       cbsArray = cbsArray.filter(c => c !== cb);
       this.eventMap.set(eventName, cbsArray);
     }

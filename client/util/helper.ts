@@ -7,7 +7,7 @@ export function getIsDevelopment() {
 
 export function getToken() {
   const token = localStorage.getItem('__token');;
-  if (token != null && token.trim() === '') return null;
+  if (token == null) return undefined;
   return token;
 }
 

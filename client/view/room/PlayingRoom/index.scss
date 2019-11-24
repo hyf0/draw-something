@@ -8,36 +8,7 @@
     display: flex;
     flex-flow: column nowrap;
     overflow: hidden;
-    .player-list {
-      display: flex;
-      flex-flow: row wrap;
-      .player-list-item {
-        width: 25%;
-        padding: 10px;
-        box-sizing: border-box;
-        &.active {
-          .player-list-item-avatar {
-            background-color: royalblue;
-            color: #fff;
-          }
-        }
-        .player-list-item-avatar {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          background-color: #fff;
-          height: 10vh;
-          font-size: 8vw;
-          font-weight: 100;
-        }
-        .player-list-item-username {
-          padding: 5px;
-          font-size: 3vw;
-          font-weight: 100;
-          text-align: center;
-        }
-      }
-    }
+
     .start-game-button-wrapper {
       padding: 5px;
       .start-game-button {

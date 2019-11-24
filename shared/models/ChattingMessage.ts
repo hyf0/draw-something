@@ -6,7 +6,7 @@ export default class ChattingMessage {
   constructor(public content: string, public speaker: {
     name: string;
     id: string;
-  }) {
+  } = {name: '你画我猜', id: 'game'}) {
 
   }
 }

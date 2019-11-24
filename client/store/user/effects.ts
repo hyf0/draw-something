@@ -1,29 +1,20 @@
 import { TReduxThunk } from '../effects';
 import { userActions } from '../actions';
 import { getToken, setToken } from '../../util/helper';
-import { IUser } from '../../../shared/types';
+import API from '@client/API';
 
 export function login(): TReduxThunk {
-  return async (dispatch, getState) => {
-    const {
-      connection: { wsClient },
-    } = getState();
+  return async dispatch => {
     const token = getToken();
-    const user = (await wsClient.request('login', token)).data as IUser;
+    const user = await API.user.login(token);
     setToken(user.token);
     dispatch(userActions.createSetUser(user));
   };
 }
 
-export function changeUsername(username: string): TReduxThunk {
-  return async (dispatch, getState) => {
-    const {
-      connection: { wsClient },
-    } = getState();
-    const changedName = (await wsClient.request(
-      'changeUsername',
-      username,
-    )).data as string;
-    dispatch(userActions.createSetUsername(changedName));
+export function changeUsername(usrName: string): TReduxThunk {
+  return async dispatch => {
+    const changed = await API.user.changeUsername(usrName);
+    dispatch(userActions.createSetUsername(changed));
   };
 }

@@ -9,19 +9,24 @@ import {
   DialogActions,
   DialogContent,
   TextField,
+  IconButton,
 } from '@material-ui/core';
-import { SearchOutlined as SearchIcon} from '@material-ui/icons';
+import {
+  SearchOutlined as SearchIcon,
+  Add as PlusIcon,
+} from '@material-ui/icons';
 import { useDispatch } from 'react-redux';
 import { push } from 'connected-react-router';
 
 import { createHandleOnKeyEnterUp } from '@client/util/helper';
 
-
-const GameLobbyHeader = React.memo(function GameLobbyHeader () {
+const GameLobbyHeader = React.memo(function GameLobbyHeader() {
   const dispatch = useDispatch();
 
   const [isShowFindRoom, setIsShowFindRoom] = useState(false);
-  const closeFindRoom = useCallback(() => setIsShowFindRoom(false), [setIsShowFindRoom]);
+  const closeFindRoom = useCallback(() => setIsShowFindRoom(false), [
+    setIsShowFindRoom,
+  ]);
 
   const [roomId, setRoomId] = useState('');
   const jumoToFindRoom = useCallback(() => {
@@ -30,8 +35,8 @@ const GameLobbyHeader = React.memo(function GameLobbyHeader () {
   }, [roomId, dispatch]);
 
   return (
-  <>
-    <Dialog open={isShowFindRoom} onClose={closeFindRoom}>
+    <>
+      <Dialog open={isShowFindRoom} onClose={closeFindRoom}>
         <DialogTitle>查找房间</DialogTitle>
         <DialogContent>
           <TextField
@@ -44,35 +49,39 @@ const GameLobbyHeader = React.memo(function GameLobbyHeader () {
           />
         </DialogContent>
         <DialogActions>
-          <Button disabled={roomId.trim().length === 0} onClick={jumoToFindRoom}>确定</Button>
+          <Button
+            disabled={roomId.trim().length === 0}
+            onClick={jumoToFindRoom}
+          >
+            确定
+          </Button>
           <Button onClick={closeFindRoom}>取消</Button>
         </DialogActions>
       </Dialog>
-    <AppBar
-      style={{
-        boxShadow: 'none',
-      }}
-      position="static"
-    >
-      <Toolbar>
-        <Button onClick={() => setIsShowFindRoom(true)} color="inherit">
-          <SearchIcon />
-          查找房间
-        </Button>
-        <Typography
-          style={{
-            flex: 1,
-            textAlign: 'center',
-          }}
-        >
-          你画我猜-游戏大厅
-        </Typography>
-        <Button onClick={() => dispatch(push('/create-room'))} color="inherit">
-          创建房间
-        </Button>
-      </Toolbar>
-    </AppBar>
-  </>
+      <AppBar
+        style={{
+          boxShadow: 'none',
+        }}
+        position="static"
+      >
+        <Toolbar>
+          <IconButton color="default" onClick={() => setIsShowFindRoom(true)}>
+            <SearchIcon />
+          </IconButton>
+          <Typography
+            style={{
+              flex: 1,
+              textAlign: 'center',
+            }}
+          >
+            你画我猜-游戏大厅
+          </Typography>
+          <IconButton onClick={() => dispatch(push('/create-room'))}>
+            <PlusIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+    </>
   );
 });
 

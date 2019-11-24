@@ -16,7 +16,7 @@ if (IS_DEV_CLIENT) {
 (function() { // 禁止手机浏览器下拉刷新的效果
   const bodyEl = document.querySelector('body') as HTMLBodyElement;
   bodyEl.addEventListener('touchmove', evt => {
-    console.log('touchstart');
+    // console.log('touchstart');
     evt.preventDefault();
   }, {
     passive: false,

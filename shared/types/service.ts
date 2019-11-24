@@ -34,14 +34,12 @@ export interface IRoom {
 
 export interface IGame {
   users: IUser[],
-  playTimes: number,
   gameTime: number,
   userScores: {
     [userId: string]: number,
   },
   newestDrawing: string | undefined;
   // userDraw: string,
-  currentTimes: number,
   playInfo: {
     keyword: {
       raw: string;

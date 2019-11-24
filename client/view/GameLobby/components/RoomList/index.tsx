@@ -1,59 +1,52 @@
 import './index.scss';
 
-import {
-  Button,
-  IconButton,
-  List,
-  ListItem,
-  ListSubheader,
-} from '@material-ui/core';
-import { LoopOutlined as FreshIcon } from '@material-ui/icons';
-
 import { roomActions } from '@client/store/actions';
 import { roomEffects } from '@client/store/effects';
 import { IReduxState } from '@client/store/reducers';
 import { IS_DEV_CLIENT } from '@client/util/constants';
+import wsClient from '@client/WebsocketClient/wsClient';
+import { Button, IconButton, List, ListSubheader } from '@material-ui/core';
+import { LoopOutlined as FreshIcon } from '@material-ui/icons';
 import { push } from 'connected-react-router';
 import React, { useCallback, useEffect } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { IRoom } from '../../../../../shared/types';
+
 import { RoomStatus } from '../../../../../shared/constants/room';
+import { IRoom } from '../../../../../shared/types';
 
 const statusText = {
   [RoomStatus.GAMING]: '游戏中',
-  [RoomStatus.WAITING]: '等待中',
+  [RoomStatus.WAITING]: '等待中...',
 };
 
 function RoomListItem({ room }: { room: IRoom }) {
   const dispatch = useDispatch();
   return (
-      <div className="room-list-room">
+    <div className="room-list-room">
+      <div className="room-info">
         <div className="room-name">{room.name}</div>
-        <div className="room-info">
-          <div className="room-number">
-            No.{String(room.id).padStart(5, '0')}
-          </div>
-          <div className="room-status">{statusText[room.status]}</div>
-        </div>
-        <div className="room-actions">
-          <Button
-            onClick={() => dispatch(push(`/room/${room.id}`))}
-            fullWidth
-            variant="outlined"
-          >
-            加入房间
-          </Button>
-        </div>
+        <div className="room-number">No.{String(room.id).padStart(5, '0')}</div>
       </div>
+      <div className="room-actions">
+        <div className="room-status">{statusText[room.status]}</div>
+        <Button
+          onClick={() => dispatch(push(`/room/${room.id}`))}
+          style={{ boxShadow: 'none' }}
+          fullWidth
+          variant="contained"
+          color="primary"
+        >
+          加入{`(${room.users.length}/${room.maxPlayerNumber})`}
+        </Button>
+      </div>
+    </div>
   );
 }
 
 const selectorRoomList = ({
   room: { roomList },
-  connection: { wsClient },
 }: IReduxState) => ({
   roomList,
-  wsClient,
 });
 
 export default function RoomList() {
@@ -61,7 +54,7 @@ export default function RoomList() {
     console.log('render RoomList');
   }
 
-  const { roomList, wsClient } = useSelector(selectorRoomList, shallowEqual);
+  const { roomList } = useSelector(selectorRoomList, shallowEqual);
 
   const dispatch = useDispatch();
   const freshRoomList = useCallback(() => {
@@ -79,7 +72,7 @@ export default function RoomList() {
     return () => {
       refreshRoomListOff();
     };
-  }, [dispatch, freshRoomList, wsClient]);
+  }, [dispatch, freshRoomList]);
 
   return (
     <div className="room-list">

@@ -1,6 +1,6 @@
+import { ReservedEventName } from '../../shared/constants';
 import { RoomStatus, RoomType } from '../../shared/constants/room';
 import ChattingMessage from '../../shared/models/ChattingMessage';
-
 import HandlerContext from '../models/HandlerContext';
 import Game from '../services/Game';
 import Room from '../services/Room';
@@ -11,20 +11,18 @@ export default class RoomHandler {
       name: string;
       type: RoomType;
     };
-    const room = new Room({ name, type }, ctx.globals);
+    const room = Room.create({ name, type });
     ctx.sendRespData(room);
-
-    room.refreshRoomList();
   }
 
   static userEnter(ctx: HandlerContext) {
     const { user } = ctx;
     if (user == undefined) return;
     // 这时候不能从ctx里取room，因为user还没有设置roomId，所以ctx拿不到room
-    const { id: roomId } = ctx.req.data as { id: number };
+    const { roomId } = ctx.req.data as { roomId: number };
     const room = ctx.globals.roomMap.get(roomId);
 
-    if (room == null) {
+    if (room === undefined) {
       ctx.sendRespError('房间不存在');
     } else {
       room.addPlayerToRoom(user);
@@ -32,21 +30,8 @@ export default class RoomHandler {
         room,
         user,
       });
-
-      room.sendMessageToUsersButUser(
-        room,
-        'refreshRoomInfo',
-        user,
-        `${user.username} 进入了游戏`,
-      ); // 针对房间里其他人
-      room.sendChattingMessageToUsers(
-        new ChattingMessage(`${user.username} 进入了游戏`, {
-          name: '游戏平台',
-          id: 'game',
-        }),
-      );
-
-      room.refreshRoomList();
+      room.sendDataToUsersButUser(room, ReservedEventName.REFRESH_ROOM, user); // 针对房间里其他人,刷新房间信息
+      room.sendChatting(new ChattingMessage(`${user.username} 进入了游戏`));
 
     }
   }
@@ -56,16 +41,9 @@ export default class RoomHandler {
     if (room == undefined || user == undefined) return;
 
     room.removePlayerInRoom(user);
-    room.sendMessageToUsers(room, 'refreshRoomInfo');
+    room.sendDataToUsers(room, ReservedEventName.REFRESH_ROOM);
 
-    room.sendChattingMessageToUsers(
-      new ChattingMessage(`${user.username} 离开了游戏`, {
-        name: '你画我猜',
-        id: 'game',
-      }),
-    );
-
-    room.refreshRoomList();
+    room.sendChatting(new ChattingMessage(`${user.username} 离开了游戏`));
 
   }
 
@@ -79,7 +57,7 @@ export default class RoomHandler {
       ctx.sendRespError('房间不存在');
       return;
     }
-    room.sendChattingMessageToUsers(
+    room.sendChatting(
       new ChattingMessage(content, {
         id: user.id,
         name: user.username,
@@ -90,9 +68,10 @@ export default class RoomHandler {
   static roomList(ctx: HandlerContext) {
     const roomList = [...ctx.globals.roomMap.values()];
     const filtedRoomList = roomList.filter(
-      room => room.status === RoomStatus.WAITING && // 不在游戏中
-      !room.isFulled && // 没有满
-      room.type === RoomType.PUBLIC // 非私人房间)
+      room =>
+        room.status === RoomStatus.WAITING && // 不在游戏中
+        !room.isFulled && // 没有满
+        room.type === RoomType.PUBLIC, // 非私人房间)
     );
     ctx.sendRespData(filtedRoomList);
   }
@@ -103,36 +82,32 @@ export default class RoomHandler {
     const usersOfRoom = room.users;
     const readyUsers = usersOfRoom.filter(u => u.isReady);
     if (usersOfRoom.length > 1 && usersOfRoom.length === readyUsers.length) {
-      usersOfRoom.forEach(u => u.isGaming = true);
-      const game = new Game(room, ctx.globals);
+      usersOfRoom.forEach(u => (u.isGaming = true));
+      const game = new Game(room);
       room.status = RoomStatus.GAMING;
-      usersOfRoom.forEach(u => u.isReady = false); // 重置user.isReady状态
+      usersOfRoom.forEach(u => (u.isReady = false)); // 重置user.isReady状态
 
-      room.sendMessageToUsers({
-        user,
-        game,
-      }, 'startGame');
+      room.sendDataToUsers(
+        {
+          user,
+          game,
+        },
+        ReservedEventName.START_GAME,
+      );
 
-      room.refreshRoomList();
+      Room.refreshRoomList(); // 房间信息变化，刷新房间列表
     }
   }
 
   static makeGameReady(ctx: HandlerContext) {
     const { user, room } = ctx;
     if (room == undefined || user == undefined) return;
-
     user.isReady = true;
     ctx.sendRespData({
       user,
       room,
     });
-
-    room.sendChattingMessageToUsers(
-      new ChattingMessage(`${user.username} 已经准备`, {
-        name: '你画我猜',
-        id: 'game',
-      }),
-    );
+    room.refreshRoomOfUsers(user);
     RoomHandler.startGameIfAllPlayerIsReady(ctx);
   }
 
@@ -145,11 +120,6 @@ export default class RoomHandler {
       user,
       room,
     });
-    room.sendChattingMessageToUsers(
-      new ChattingMessage(`${user.username} 取消了准备`, {
-        name: '你画我猜',
-        id: 'game',
-      }),
-    );
+    room.refreshRoomOfUsers(user);
   }
 }

@@ -1,7 +1,9 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
 import { replace } from 'connected-react-router';
 import { IReduxState } from '../store/reducers';
+import FullScreenLoading from '../ui/FullScreenLoading';
+import { userEffects } from '../store/effects';
 
 const selectorAuthLoyout = ({ user: { user }, router: { location: { pathname } } }: IReduxState) => ({
   user,
@@ -16,7 +18,10 @@ export default function AuthLoyout({ children}: {children: any}) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (user == null) return;
+    if (user == null) {
+      dispatch(userEffects.login());
+      return;
+    }
 
     if (user.isGaming && user.currentRoomId == null) {
       console.error('用户正在游戏中', '但找不到房间号');
@@ -31,6 +36,7 @@ export default function AuthLoyout({ children}: {children: any}) {
     }
   }, [user, pathname, dispatch]);
 
+  if (user == null) return <FullScreenLoading />
 
   return children;
 }

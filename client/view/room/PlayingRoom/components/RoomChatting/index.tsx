@@ -1,35 +1,36 @@
 import './index.scss';
 
-import { Button, List, ListItem, TextField } from '@material-ui/core';
 import { roomEffects } from '@client/store/effects';
 import { IReduxState } from '@client/store/reducers';
 import { createHandleOnKeyEnterUp } from '@client/util/helper';
+import wsClient from '@client/WebsocketClient/wsClient';
+import { Button, List, ListItem, TextField } from '@material-ui/core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+
 import ChattingMessage from '../../../../../../shared/models/ChattingMessage';
+import { ReservedEventName } from '../../../../../../shared/constants';
 
 const selectorRoomMessage = ({
-  connection: { wsClient },
   user: { user },
 }: IReduxState) => ({
-  wsClient,
   username: user == null ? '' : user.username,
   userId: user == null ? '' : user.id,
 });
 
-function RoomMessage() {
-  const { wsClient, userId } = useSelector(
+function RoomChatting() {
+  const { userId } = useSelector(
     selectorRoomMessage,
     shallowEqual,
   );
   const [chatMsgList, setChatMsgList] = useState<ChattingMessage[]>([]);
   useEffect(() => {
-    const offReciveChatMessage = wsClient.on('reciveChatMessage', (_, msg) => {
+    const offReciveChatMessage = wsClient.on(ReservedEventName.ROOM_CHATTING, (_, msg) => {
       const chatMsg = msg.data as ChattingMessage;
       setChatMsgList(prev => [chatMsg].concat(...prev));
     });
     return offReciveChatMessage;
-  }, [wsClient, setChatMsgList]);
+  }, [setChatMsgList]);
 
   // chat msg 相关
 
@@ -83,4 +84,4 @@ function RoomMessage() {
   );
 }
 
-export default RoomMessage;
+export default RoomChatting;

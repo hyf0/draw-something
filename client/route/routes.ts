@@ -1,10 +1,10 @@
-import GameLobby from "@client/view/GameLobby";
-import BasicLayout from "@client/layout/BasicLayout";
-import CreateRoom from "@client/view/room/CreateRoom";
-import PlayingRoom from "@client/view/room/PlayingRoom";
-import AuthLoyout from "@client/layout/AuthLayout";
-import Game from "@client/view/game/Game";
-
+import GameLobby from '@client/view/GameLobby';
+import BasicLayout from '@client/layout/BasicLayout';
+import CreateRoom from '@client/view/room/CreateRoom';
+import PlayingRoom from '@client/view/room/PlayingRoom';
+import AuthLoyout from '@client/layout/AuthLayout';
+import Game from '@client/view/game/Game';
+import CustomThemeLayout from '@client/layout/CustomThemeLayout';
 
 interface IRoute {
   path: string;
@@ -19,28 +19,34 @@ const routes: IRoute[] = [
     component: AuthLoyout,
     children: [
       {
-          path: '/',
-          component: BasicLayout,
-          children: [
-            {
-              path: '/create-room',
-              component: CreateRoom,
-            },
-            {
-              path: '/game/:id',
-              component: Game,
-            },
-            {
-              path: '/room/:roomId',
-              component: PlayingRoom,
-            },
-            {
-              path: '/',
-              component: GameLobby,
-            }
-          ]
+        path: '/',
+        component: BasicLayout,
+        children: [
+          {
+            path: '/',
+            component: CustomThemeLayout,
+            children: [
+              {
+                path: '/create-room',
+                component: CreateRoom,
+              },
+              {
+                path: '/game/:id',
+                component: Game,
+              },
+              {
+                path: '/room/:roomId',
+                component: PlayingRoom,
+              },
+              {
+                path: '/',
+                component: GameLobby,
+              },
+            ],
+          },
+        ],
       },
-    ]
-  }
+    ],
+  },
 ];
 export default routes;

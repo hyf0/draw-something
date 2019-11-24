@@ -3,19 +3,27 @@
   display: flex;
   flex-flow: column nowrap;
   .view-game-main {
+    display: flex;
+    flex-flow: column nowrap;
     flex: 1;
-    .player-list {
+    overflow: hidden;
+    .user-list {
       display: flex;
       flex-flow: row wrap;
-      .player-list-item {
-        flex: 0 0 25%;
-        display: flex;
-        justify-content: center;
+      padding: 0 12px;
+      .user-list-user {
+        margin-right: 12px;
+        margin-top: 6px;
+        .username {
+          padding-top: 4px;
+          text-align: center;
+        }
       }
     }
     .game-message-list {
       padding: 20px;
-      height: 50px;
+      // height: 50px;
+      flex: 1;
       overflow-y: scroll;
     }
   }

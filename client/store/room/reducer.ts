@@ -1,9 +1,10 @@
-import { RoomStatus } from 'shared/constants/room';
-import { IGame, IRoom, IUser } from 'shared/types';
 import { produce } from 'immer';
 
+import { RoomStatus } from '../../../shared/constants';
+import { IGame, IRoom, IUser } from '../../../shared/types';
 import { IAction } from '../actions';
 import { roomActionTypes } from '../actionTypes';
+
 
 export interface IReduxRoomState {
   roomList: IRoom[];

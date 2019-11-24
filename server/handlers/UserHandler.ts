@@ -1,39 +1,36 @@
-import HandlerContext from "../models/HandlerContext";
-import User from "../services/User";
+import HandlerContext from '../models/HandlerContext';
+import User from '../services/User';
 
 export default class UserHandler {
-
   static login(ctx: HandlerContext) {
     const userToken = ctx.req.data as string | undefined;
-    let isReuseedOffLineUser = false;
-    if (userToken != undefined) {
-      const offLineUser = ctx.globals.sesstionUserMap.get(userToken);
-      if (offLineUser != undefined) {
-        offLineUser.reuse(ctx.ws);
-        ctx.connection.user = offLineUser;  // warn！！ 这个实现很不优雅，看看怎么改进
-        isReuseedOffLineUser = true;
-        ctx.sendRespData(offLineUser)
-        return;
-      }
+    let user: User | undefined;
+    const offLineUser = ctx.globals.sesstionUserMap.get(userToken || '__guest'); // 如果是 __guest，返回的是undefined
+    if (offLineUser != undefined) {
+      offLineUser.reuse(ctx.ws);
+      user = offLineUser;
     }
-    if (!isReuseedOffLineUser) {
-      const user = new User(ctx.ws, ctx.globals);;
-      ctx.connection.user = user; // warn！！ 这个实现很不优雅，看看怎么改进
-      ctx.sendRespData(user)
-    }
+    if (user == undefined) user = new User(ctx.ws); // 没找到缓存
+    ctx.connection.user = user; // warn！！ 这个实现很不优雅，看看怎么改进
+    ctx.sendRespData(user);
   }
+
   static changeUsername(ctx: HandlerContext) {
     const { user } = ctx;
-    if (user == null) return;
+    if (user == null) {
+      ctx.sendRespError('请先登录');
+      return;
+    }
 
-    const newUsername = ctx.req.data as string;
-    if (typeof newUsername === 'string' && newUsername.trim().length > 0) {
-      user.changeUsername(newUsername);
-      ctx.sendRespData(newUsername);
+    const newUsrName = ctx.req.data;
+    if (typeof newUsrName === 'string' && newUsrName.trim().length > 0) {
+      user.changeUsername(newUsrName);
+      ctx.sendRespData(newUsrName);
     }
   }
 
   static numberOfOnlineUser(ctx: HandlerContext) {
-    ctx.sendRespData(ctx.globals.sesstionUserMap.size);
+    const result = ctx.globals.sesstionUserMap.size;
+    ctx.sendRespData(result);
   }
 }

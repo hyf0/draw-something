@@ -35,12 +35,18 @@ export default class HandlerContext {
   }
 
   sendRespData(data: unknown) {
-    const respMsg = new ResponseMessage(data, this.req.id);
+    const respMsg = new ResponseMessage({
+      data,
+      requestId: this.req.id,
+    });
     SenderService.send(this.ws, respMsg);
   }
 
   sendRespError(errTitle: string, errDetail?: string) {
-    const respMsg = new ResponseMessage(undefined, this.req.id);
+    const respMsg = new ResponseMessage({
+      data: undefined,
+      requestId: this.req.id,
+    });
     SenderService.sendError(this.ws, respMsg, {
       title: errTitle,
       detail: errDetail,

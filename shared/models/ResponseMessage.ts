@@ -7,12 +7,20 @@ export default class ResponseMessage {
     title: string;
     detail?: string;
   };
-  constructor(
-    public data: any,
-    public requestId?: string,
-    public trigger?: string,
-    public desc?: string,
-  ) {
+  data: unknown;
+  requestId?: string;
+  trigger?: string;
+  desc?: string;
+  constructor(options: {
+    data: unknown;
+    requestId?: string;
+    trigger?: string;
+    desc?: string;
+  }) {
+    this.data = options.data;
+    this.requestId = options.requestId;
+    this.trigger = options.trigger;
+    this.desc = options.desc;
   }
 
   toJSON() {

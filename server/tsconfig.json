@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "UMD",
+    "outDir": "../dist",
+    "moduleResolution": "node",
+    "esModuleInterop": true
+  },
+  "include": [
+    "../shared",
+    "../server"
+  ]
+}
