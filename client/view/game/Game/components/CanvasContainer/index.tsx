@@ -211,20 +211,21 @@ function Canvas({
     [snapshotCurrentDrawing, startDrawLine],
   );
 
-  const syncCurrentDrawingToServer = useCallback(() => {
-    sendDrawActionToServer(DrawActionType.END_DRAW_LINE, undefined, {
-      newestDrawing: draw.getSnapshot(),
-    }); // 同步最新画作到服务器上
-  }, [draw]);
 
   const handleTouchMove = useCallback(
     (evt: TouchEvent) => {
       const p = getPointFromEvent(evt);
       drawLineTo(p);
-      syncCurrentDrawingToServer();
     },
-    [drawLineTo, syncCurrentDrawingToServer],
+    [drawLineTo],
   );
+
+  const handleTouchEnd = useCallback(() => {
+    const drawing = draw.getSnapshot();
+    sendDrawActionToServer(DrawActionType.DRAW_IMAGE, draw.getSnapshot(), {
+      newestDrawing: drawing,
+    });
+  }, [draw]);
 
 
 
@@ -241,7 +242,7 @@ function Canvas({
           }}
           onTouchStart={isSelfPlaying ? handleTouchStart : undefined}
           onTouchMove={isSelfPlaying ? handleTouchMove : undefined}
-          onTouchEnd={isSelfPlaying ? undefined : undefined}
+          onTouchEnd={isSelfPlaying ? handleTouchEnd : undefined}
         />
       </div>
       {!isSelfPlaying ? null : (
