@@ -1,9 +1,7 @@
+import { ReservedEventName } from '../../shared/constants';
 import ChattingMessage from '../../shared/models/ChattingMessage';
-import ResponseMessage from '../../shared/models/ResponseMessage';
 import DrawAction from '../models/DrawAction';
 import HandlerContext from '../models/HandlerContext';
-import SenderService from '../services/SenderService';
-import { ReservedEventName } from '../../shared/constants';
 
 export default class GameHandler {
   static getGame(ctx: HandlerContext) {
@@ -25,10 +23,11 @@ export default class GameHandler {
 
     const { drawAction, newestDrawing } = message.data as {
       drawAction: DrawAction;
-      newestDrawing: string;
+      newestDrawing?: string;
     };
-
-    game.newestDrawing = newestDrawing;
+    if (newestDrawing !== undefined) {
+      game.newestDrawing = newestDrawing;
+    }
     room.sendDataToUsersButUser(
       drawAction,
       ReservedEventName.DRAW_ACTION,

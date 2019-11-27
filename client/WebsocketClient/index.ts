@@ -48,7 +48,9 @@ export default class WebsocketClient {
     };
     this.ws.onmessage = ({ data: rawMessage }) => {
       const msg: ResponseMessage = JSON.parse(rawMessage);
-      console.log('recive', msg);
+      if (msg.trigger === undefined || (msg.trigger !== undefined && msg.trigger !== 'timeout')) {
+        console.log('recive', msg);
+      }
       this.emit('message', msg);
       if (msg.requestId != null) {
         this.emit(msg.requestId, msg);

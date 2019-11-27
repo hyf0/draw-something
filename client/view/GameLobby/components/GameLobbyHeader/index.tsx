@@ -1,24 +1,11 @@
-import React, { useState, useCallback } from 'react';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogActions,
-  DialogContent,
-  TextField,
-  IconButton,
-} from '@material-ui/core';
-import {
-  SearchOutlined as SearchIcon,
-  Add as PlusIcon,
-} from '@material-ui/icons';
-import { useDispatch } from 'react-redux';
-import { push } from 'connected-react-router';
+import './index.scss';
 
 import { createHandleOnKeyEnterUp } from '@client/util/helper';
+import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, TextField } from '@material-ui/core';
+import { Add as PlusIcon, SearchOutlined as SearchIcon } from '@material-ui/icons';
+import { push } from 'connected-react-router';
+import React, { useCallback, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 const GameLobbyHeader = React.memo(function GameLobbyHeader() {
   const dispatch = useDispatch();
@@ -64,22 +51,17 @@ const GameLobbyHeader = React.memo(function GameLobbyHeader() {
         }}
         position="static"
       >
-        <Toolbar>
+        <div className="game-lobby-header">
           <IconButton color="default" onClick={() => setIsShowFindRoom(true)}>
             <SearchIcon />
           </IconButton>
-          <Typography
-            style={{
-              flex: 1,
-              textAlign: 'center',
-            }}
-          >
-            你画我猜-游戏大厅
-          </Typography>
+          <div className="game-lobby-header-title">
+            你画我猜-游戏大厅(v0.02)
+          </div>
           <IconButton onClick={() => dispatch(push('/create-room'))}>
             <PlusIcon />
           </IconButton>
-        </Toolbar>
+        </div>
       </AppBar>
     </>
   );

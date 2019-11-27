@@ -9,6 +9,7 @@ import React, { TouchEvent, useCallback, useEffect, useLayoutEffect, useRef, use
 
 import { ReservedEventName } from '../../../../../../shared/constants';
 import RequestMessage from '../../../../../../shared/models/RequestMessage';
+import { IGame } from '../../../../../../shared/types';
 import wsClient from '../../../../../WebsocketClient/wsClient';
 import SetPenColorButton from './SetPenColorButton';
 import SetPenSizeButton from './SetPenSizeButton';
@@ -45,10 +46,10 @@ function getPointFromEvent(evt: TouchEvent): Point {
 
 function Canvas({
   isSelfPlaying,
-  initialDrawing,
+  currentGame,
 }: {
   isSelfPlaying: boolean;
-  initialDrawing?: string;
+  currentGame: IGame;
 }) {
   const drawRef = useRef(new CanvasController());
   const draw = drawRef.current;
@@ -56,21 +57,23 @@ function Canvas({
   const [pastDrawings, setPastDrawings] = useState<string[]>([]);
   const [penColor, setPenColor] = useState('#000');
   const [penSize, setPenSize] = useState(1);
-  const isMountedRef = useRef(false);
+  const isInitializedRef = useRef(false);
 
   // 生命周期
 
   useLayoutEffect(() => {
-    if (isMountedRef.current === false) {
-      draw.mount('#id-canvas');
-      if (initialDrawing !== undefined) {
-        draw.drawImage(initialDrawing);
-      }
-      isMountedRef.current = true;
+    if (currentGame.newestDrawing !== undefined) {
+      draw.drawImage(currentGame.newestDrawing);
     }
-  }, [draw, initialDrawing]);
+    if (isInitializedRef.current === false) {
+      console.log('currentGame', currentGame);
+      draw.mount('#id-canvas');
+      isInitializedRef.current = true;
+    }
+  }, [draw, currentGame]);
 
   useEffect(() => {
+
     const changePlayingUserOff = wsClient.on(
       ReservedEventName.CHANGE_DRAWER,
       () => {
@@ -208,19 +211,22 @@ function Canvas({
     [snapshotCurrentDrawing, startDrawLine],
   );
 
-  const handleTouchMove = useCallback(
-    (evt: TouchEvent) => {
-      const p = getPointFromEvent(evt);
-      drawLineTo(p);
-    },
-    [drawLineTo],
-  );
-
-  const handleTouchEnd = useCallback(() => {
+  const syncCurrentDrawingToServer = useCallback(() => {
     sendDrawActionToServer(DrawActionType.END_DRAW_LINE, undefined, {
       newestDrawing: draw.getSnapshot(),
     }); // 同步最新画作到服务器上
   }, [draw]);
+
+  const handleTouchMove = useCallback(
+    (evt: TouchEvent) => {
+      const p = getPointFromEvent(evt);
+      drawLineTo(p);
+      syncCurrentDrawingToServer();
+    },
+    [drawLineTo, syncCurrentDrawingToServer],
+  );
+
+
 
   const [posDivEl, setPosDivEl] = useState<HTMLDivElement | null>(null);
 
@@ -235,7 +241,7 @@ function Canvas({
           }}
           onTouchStart={isSelfPlaying ? handleTouchStart : undefined}
           onTouchMove={isSelfPlaying ? handleTouchMove : undefined}
-          onTouchEnd={isSelfPlaying ? handleTouchEnd : undefined}
+          onTouchEnd={isSelfPlaying ? undefined : undefined}
         />
       </div>
       {!isSelfPlaying ? null : (

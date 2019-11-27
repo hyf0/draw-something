@@ -37,3 +37,10 @@ export function createSetCurrentRoomStatus(s: RoomStatus): IAction {
     payload: s,
   }
 }
+
+export function createSetCurrentGameUsers(us: IUser[]): IAction {
+  return {
+    type: roomActionTypes.SET_CURRENT_GAME_USERS,
+    payload: us,
+  }
+}

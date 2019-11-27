@@ -87,7 +87,11 @@ export default function PlayingRoom() {
       <div className="view-playing-room-main">
         <UserList users={currentRoom.users} />
         <div className="start-game-button-wrapper">
-          <Button onClick={toggleGameReady} className="start-game-button" variant="outlined" fullWidth>
+          <Button style={{
+            // backgroundColor: 'orange',
+            // color: '#fff',
+            boxShadow: 'none',
+          }} onClick={toggleGameReady} color="primary" className="start-game-button" variant="contained" fullWidth>
             {isReady ? '取消准备' : '准备'}
           </Button>
         </div>

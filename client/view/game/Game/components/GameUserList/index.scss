@@ -1,0 +1,13 @@
+.game-user-list {
+  display: flex;
+  flex-flow: row wrap;
+  padding: 0 12px;
+  .user-list-user {
+    margin-right: 12px;
+    margin-top: 12px;
+    .username {
+      padding-top: 4px;
+      text-align: center;
+    }
+  }
+}

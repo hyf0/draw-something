@@ -1,5 +1,6 @@
 import './index.scss';
 
+import UserAvatar from '@client/ui/UserAvatar';
 import React from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import { IReduxState } from 'store/reducers';
@@ -20,29 +21,29 @@ const UserList = React.memo(function UserList({ users }: { users: IUser[] }) {
         if (index < users.length) {
           const user = users[index];
           return (
-            <div key={user.id} className="player-list-item active">
-              <div className="user-status">
+            <div key={user.id} className="user-list-user">
+              <UserAvatar avatar={user.username[0]}>
                 {user.id === userId ? (
-                  <div className="player-list-item-status">我</div>
-                ) : null}
-                {user.isReady ? (
-                  <div className="player-list-item-status">已准备</div>
+                  <UserAvatar.AvatarStatus text="我" />
                 ) : null}
                 {user && index === 0 ? (
-                  <div className="player-list-item-status">房主</div>
+                  <UserAvatar.AvatarStatus text="房主" />
                 ) : null}
-                <div className="user-avatar">{user.username[0]}</div>
-              </div>
-              <div className="player-list-item-username">{user.username}</div>
+                {user.isReady ? (
+                  <UserAvatar.AvatarStatus bgColor="green" text="已准备" />
+                ) : null}
+              </UserAvatar>
+              <div className="user-list-item-username">{user.username}</div>
             </div>
           );
         }
         return (
-          <div key={index} className="player-list-item">
-            <div className="user-status">
-              <div className="user-avatar">空</div>
-            </div>
-            <div className="player-list-item-username">等待加入</div>
+          <div key={index} className="user-list-user">
+            <UserAvatar style={{
+              backgroundColor: '#fff',
+              color: '#000',
+            }} avatar="空" />
+              <div className="user-list-item-username">等待加入</div>
           </div>
         );
       })}

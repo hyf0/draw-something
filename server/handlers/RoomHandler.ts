@@ -12,6 +12,7 @@ export default class RoomHandler {
       type: RoomType;
     };
     const room = Room.create({ name, type });
+    Room.refreshRoomList();
     ctx.sendRespData(room);
   }
 
@@ -23,16 +24,16 @@ export default class RoomHandler {
     const room = ctx.globals.roomMap.get(roomId);
 
     if (room === undefined) {
-      ctx.sendRespError('房间不存在');
-    } else {
-      room.addPlayerToRoom(user);
-      ctx.sendRespData({
-        room,
-        user,
-      });
-      room.sendDataToUsersButUser(room, ReservedEventName.REFRESH_ROOM, user); // 针对房间里其他人,刷新房间信息
+      ctx.sendRespError(`房间 ${roomId} 不存在`);
+      return;
+    }
+    try {
+      room.addUser(user);
+      ctx.sendRespData({ room, user });
+      room.refreshRoomOfUsers(user); // 针对房间里其他人,刷新房间信息
       room.sendChatting(new ChattingMessage(`${user.username} 进入了游戏`));
-
+    } catch (err) {
+      ctx.sendRespError(err.message);
     }
   }
 
@@ -40,23 +41,19 @@ export default class RoomHandler {
     const { room, user } = ctx;
     if (room == undefined || user == undefined) return;
 
-    room.removePlayerInRoom(user);
-    room.sendDataToUsers(room, ReservedEventName.REFRESH_ROOM);
+    room.removeUser(user);
+    room.refreshRoomOfUsers(); // 针对房间里其他人,刷新房间信息
 
     room.sendChatting(new ChattingMessage(`${user.username} 离开了游戏`));
-
   }
 
   static sendChatMessage(ctx: HandlerContext) {
     const { user, room } = ctx;
-    if (user == null) return;
+    if (user == null || room == null) return;
     const { content } = ctx.req.data as {
       content: string;
     };
-    if (room == null) {
-      ctx.sendRespError('房间不存在');
-      return;
-    }
+
     room.sendChatting(
       new ChattingMessage(content, {
         id: user.id,
@@ -83,17 +80,11 @@ export default class RoomHandler {
     const readyUsers = usersOfRoom.filter(u => u.isReady);
     if (usersOfRoom.length > 1 && usersOfRoom.length === readyUsers.length) {
       usersOfRoom.forEach(u => (u.isGaming = true));
-      const game = new Game(room);
+      const game = Game.create(room);
       room.status = RoomStatus.GAMING;
       usersOfRoom.forEach(u => (u.isReady = false)); // 重置user.isReady状态
 
-      room.sendDataToUsers(
-        {
-          user,
-          game,
-        },
-        ReservedEventName.START_GAME,
-      );
+      room.sendDataToUsers({ user, game }, ReservedEventName.START_GAME);
 
       Room.refreshRoomList(); // 房间信息变化，刷新房间列表
     }

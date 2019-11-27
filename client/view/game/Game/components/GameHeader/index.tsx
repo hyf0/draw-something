@@ -1,13 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-} from '@material-ui/core';
-import { IGame } from '../../../../../shared/types';
+import './index.scss';
+
 import wsClient from '@client/WebsocketClient/wsClient';
-import { ReservedEventName } from '../../../../../shared/constants';
+import { AppBar } from '@material-ui/core';
+import React, { useEffect, useRef, useState } from 'react';
+
+import { ReservedEventName } from '../../../../../../shared/constants';
+import { IGame } from '../../../../../../shared/types';
 
 function GameHeader({
   isSelfPlaying,
@@ -25,8 +23,8 @@ function GameHeader({
     });
     return () => {
       timeoutOff();
-    }
-  }, [setGameTimeSoFar])
+    };
+  }, [setGameTimeSoFar]);
 
   return (
     <AppBar
@@ -35,14 +33,14 @@ function GameHeader({
       }}
       position="static"
     >
-      <Toolbar>
-        <Typography variant="h6">
+      <div className="game-header">
+        <span className="game-header-hint">
           {isSelfPlaying
             ? `请画 ${currentGame.playInfo.keyword.raw}`
             : `${currentGame.playInfo.keyword.raw.length}个字 ${currentGame.playInfo.keyword.hint}`}
-        </Typography>
-          <Button>剩余:{gameTimeSoFar}秒</Button>
-      </Toolbar>
+        </span>
+        <span className="game-time-so-far">剩余:{gameTimeSoFar}秒</span>
+      </div>
     </AppBar>
   );
 }

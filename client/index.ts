@@ -1,13 +1,15 @@
-import { hot } from 'react-hot-loader/root';
+import './index.scss';
 import 'react-hot-loader';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import { hot } from 'react-hot-loader/root';
 
-import './index.scss';
+import App from './App';
 import { IS_DEV_CLIENT } from './util/constants';
 
 if (IS_DEV_CLIENT) {
+  console.log('开发模式');
   ReactDOM.render(React.createElement(hot(App)), document.getElementById('root'));
 } else {
   ReactDOM.render(React.createElement(App), document.getElementById('root'));

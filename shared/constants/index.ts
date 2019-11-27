@@ -15,5 +15,6 @@ export enum ReservedEventName { // 会用到的事件名，这里前后端统一
   ROUND_OVER = 'roundOver',
   GAME_OVER = 'gameOver',
   PLAY_OVER = 'playOver',
+  REFRESH_GAME_USERS = 'refreshGameUsers',
   // REFRESH_ONLINE_USER_NUMBER = 'refreshOnLineUserNumber',
 }

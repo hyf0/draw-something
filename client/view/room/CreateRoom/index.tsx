@@ -8,18 +8,18 @@ import {
   Button,
   FormControl,
   FormControlLabel,
+  IconButton,
   List,
   ListItem,
   Radio,
   RadioGroup,
   TextField,
-  Toolbar,
-  Typography,
 } from '@material-ui/core';
 import { ArrowBackOutlined as BackIcon } from '@material-ui/icons';
 import { goBack } from 'connected-react-router';
 import React, { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+
 import { RoomType } from '../../../../shared/constants/room';
 
 const indexSelector = ({
@@ -48,37 +48,29 @@ export default function CreateRoom() {
   }, [roomName, roomType, dispatch]);
 
   const [isUsingDefaultRoomName, setIsUsingDefaultRoomName] = useState(true);
-  const updateRoomName = useCallback((evt: ChangeEvent<HTMLInputElement>) => {
-    setIsUsingDefaultRoomName(false);
-    setRoomName(evt.target.value);
-  }, [setRoomName, setIsUsingDefaultRoomName]);
-
+  const updateRoomName = useCallback(
+    (evt: ChangeEvent<HTMLInputElement>) => {
+      setIsUsingDefaultRoomName(false);
+      setRoomName(evt.target.value);
+    },
+    [setRoomName, setIsUsingDefaultRoomName],
+  );
 
   return (
     <div className="view-room-creator">
-      <div className="view-room-creator-header">
-        <AppBar
-          style={{
-            boxShadow: 'none',
-          }}
-          position="static"
-        >
-          <Toolbar>
-            <Button onClick={() => dispatch(goBack())} color="inherit">
-              <BackIcon />
-              返回
-            </Button>
-            <Typography
-              style={{
-                flex: 1,
-                textAlign: 'center',
-              }}
-            >
-              创建房间
-            </Typography>
-          </Toolbar>
-        </AppBar>
-      </div>
+      <AppBar
+        style={{
+          boxShadow: 'none',
+        }}
+        position="static"
+      >
+        <div className="create-room-header">
+          <IconButton onClick={() => dispatch(goBack())}>
+            <BackIcon />
+          </IconButton>
+          <div className="create-room-header-title">创建房间</div>
+        </div>
+      </AppBar>
       <div className="view-room-creator-main">
         <FormControl fullWidth>
           <List>
@@ -116,7 +108,13 @@ export default function CreateRoom() {
               </ListItem>
             </RadioGroup>
             <ListItem>
-              <Button onClick={createRoom} fullWidth variant="outlined">
+              <Button
+                style={{ boxShadow: 'none' }}
+                onClick={createRoom}
+                fullWidth
+                color="primary"
+                variant="contained"
+              >
                 创建房间
               </Button>
             </ListItem>

@@ -10,7 +10,7 @@ export default class UserHandler {
       offLineUser.reuse(ctx.ws);
       user = offLineUser;
     }
-    if (user == undefined) user = new User(ctx.ws); // 没找到缓存
+    if (user == undefined) user = User.create(ctx.ws); // 没找到缓存
     ctx.connection.user = user; // warn！！ 这个实现很不优雅，看看怎么改进
     ctx.sendRespData(user);
   }

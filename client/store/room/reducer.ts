@@ -36,6 +36,11 @@ export default function roomReducer(state = defaultState, action: IAction) {
       case roomActionTypes.SET_CURRENT_GAME:
         draft.currentGame = payload as IGame | null;
         break;
+      case roomActionTypes.SET_CURRENT_GAME_USERS:
+        if (draft.currentGame != undefined) {
+          draft.currentGame.users = payload as IUser[];
+        }
+        break;
       case roomActionTypes.SET_CURRENT_ROOM_STATUS:
         if (draft.currentRoom != null) {
           draft.currentRoom.status = payload as RoomStatus;

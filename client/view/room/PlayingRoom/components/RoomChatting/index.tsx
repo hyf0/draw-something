@@ -4,7 +4,7 @@ import { roomEffects } from '@client/store/effects';
 import { IReduxState } from '@client/store/reducers';
 import { createHandleOnKeyEnterUp } from '@client/util/helper';
 import wsClient from '@client/WebsocketClient/wsClient';
-import { Button, List, ListItem, TextField } from '@material-ui/core';
+import { Button, List as div, ListItem, TextField } from '@material-ui/core';
 import React, { useCallback, useEffect, useState } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
@@ -34,18 +34,17 @@ function RoomChatting() {
 
   // chat msg 相关
 
-  const [msgContent, setMsgContent] = useState('');
-  const isValidatedContentt = msgContent.trim().length !== 0;
+  const [chattingContent, setChattingContent] = useState('');
   const dispatch = useDispatch();
   const sendChatMessage = useCallback(() => {
-    if (!isValidatedContentt) return;
-    setMsgContent('');
-    dispatch(roomEffects.sendChatMessage(msgContent));
-  }, [isValidatedContentt, msgContent, dispatch, setMsgContent]);
+    if (chattingContent.trim().length === 0) return;
+    setChattingContent('');
+    dispatch(roomEffects.sendChatMessage(chattingContent));
+  }, [chattingContent, dispatch, setChattingContent]);
 
   return (
     <div className="room-message">
-      <List className="room-message-list">
+      <div className="room-message-list">
         {chatMsgList.map(cm => (
           <ListItem className="room-message-list-item" key={cm.id}>
             <div className="room-message-speaker">
@@ -60,26 +59,23 @@ function RoomChatting() {
             </div>
           </ListItem>
         ))}
-      </List>
-      <List className="room-message-sender">
-        <ListItem>
+      </div>
+      <div className="room-message-sender">
           <TextField
             variant="outlined"
-            value={msgContent}
-            onChange={evt => setMsgContent(evt.target.value)}
+            value={chattingContent}
+            onChange={evt => setChattingContent(evt.target.value)}
             onKeyUp={createHandleOnKeyEnterUp(sendChatMessage)}
             fullWidth
           />
           &nbsp;
           <Button
             onClick={sendChatMessage}
-            disabled={!isValidatedContentt}
             variant="text"
           >
             发送
           </Button>
-        </ListItem>
-      </List>
+      </div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ function getConfig() {
     if (IS_DEV_CLIENT) {
         return {
             // addr: 'ws://127.0.0.1:9421',
-            addr: 'ws://192.168.137.1:9421',
+            addr: `ws://${window.location.hostname}:9421`,
         }
     }
     return {

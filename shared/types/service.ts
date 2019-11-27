@@ -5,7 +5,8 @@ export interface IUser {
   id: string;
   currentRoomId: number | undefined;
   isGaming: boolean;
-  isOnline: boolean;
+  isDeleted: boolean;
+  isOnLine: boolean;
   username: string;
   lastActiveTime: number;
   isReady: boolean;
@@ -45,7 +46,7 @@ export interface IGame {
       raw: string;
       hint: string;
     };
-    currentPlayer: IUser;
+    drawer: IUser;
     time: number;
   },
 }
