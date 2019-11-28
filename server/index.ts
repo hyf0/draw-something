@@ -19,7 +19,7 @@ const wss = new NodeWebsocket.Server(
   },
   () => {
     log(
-      `draw something websocket server is started in ${wss.path ? wss.path : '/'}:${serverConfig.port}`,
+      `draw something websocket server is started in /:${serverConfig.port}`,
     );
   },
 );

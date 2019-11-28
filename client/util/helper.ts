@@ -11,6 +11,18 @@ export function getToken() {
   return token;
 }
 
+export function throttle<T extends (...args: any[]) => any>(cb: T, frequency: number): T {
+  let lastTime = -1; // 这是为了保证第一次会被触发
+  const result = (function(...args: any[]) {
+    const curTime = Date.now();
+    if (curTime - lastTime >= frequency) {
+      lastTime = curTime;
+      cb(...args);
+    }
+  } as T)
+  return result;
+}
+
 export function setToken(token: string) {
   localStorage.setItem('__token', token);
 }

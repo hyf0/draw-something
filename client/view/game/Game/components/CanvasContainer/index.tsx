@@ -1,16 +1,33 @@
 import './Canvas.scss';
 
-import CanvasController, { ICanvasControllerSetting } from '@client/controller/CanvasController';
+import CanvasController, {
+  ICanvasControllerSetting,
+} from '@client/controller/CanvasController';
 import Point from '@client/controller/Point';
-import DrawAction, { DrawActionType } from '@client/model/DrawAction';
+import { throttle } from '@client/util/helper';
+import wsClient from '@client/WebsocketClient/wsClient';
 import { IconButton } from '@material-ui/core';
-import { Redo as RedoIcon, RestoreFromTrash as ClearIcon, Undo as UndoIcon } from '@material-ui/icons';
-import React, { TouchEvent, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  Redo as RedoIcon,
+  RestoreFromTrash as ClearIcon,
+  Undo as UndoIcon,
+} from '@material-ui/icons';
+import React, {
+  TouchEvent,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { ReservedEventName } from '../../../../../../shared/constants';
+import DrawAction, {
+  DrawActionType,
+  TDrawerExternals,
+} from '../../../../../../shared/models/DrawAction';
 import RequestMessage from '../../../../../../shared/models/RequestMessage';
 import { IGame } from '../../../../../../shared/types';
-import wsClient from '../../../../../WebsocketClient/wsClient';
 import SetPenColorButton from './SetPenColorButton';
 import SetPenSizeButton from './SetPenSizeButton';
 
@@ -19,16 +36,10 @@ import SetPenSizeButton from './SetPenSizeButton';
 function sendDrawActionToServer(
   type: DrawActionType,
   payload?: unknown,
-  extral?: { newestDrawing?: string },
+  externals?: TDrawerExternals,
 ) {
-  const drawAction = new DrawAction(type, payload);
-  const reqMsg = new RequestMessage(
-    {
-      drawAction,
-      ...(extral !== undefined ? extral : {}),
-    },
-    'drawAction',
-  );
+  const drawAction = new DrawAction(type, payload, externals);
+  const reqMsg = new RequestMessage(drawAction, ReservedEventName.DRAW_ACTION);
   wsClient.sendMessage(reqMsg);
 }
 
@@ -57,23 +68,21 @@ function Canvas({
   const [pastDrawings, setPastDrawings] = useState<string[]>([]);
   const [penColor, setPenColor] = useState('#000');
   const [penSize, setPenSize] = useState(1);
-  const isInitializedRef = useRef(false);
+  const isMountedRef = useRef(false);
 
   // 生命周期
 
   useLayoutEffect(() => {
+    if (isMountedRef.current === false) {
+      draw.mount('#id-canvas');
+      isMountedRef.current = true;
+    }
     if (currentGame.newestDrawing !== undefined) {
       draw.drawImage(currentGame.newestDrawing);
-    }
-    if (isInitializedRef.current === false) {
-      console.log('currentGame', currentGame);
-      draw.mount('#id-canvas');
-      isInitializedRef.current = true;
     }
   }, [draw, currentGame]);
 
   useEffect(() => {
-
     const changePlayingUserOff = wsClient.on(
       ReservedEventName.CHANGE_DRAWER,
       () => {
@@ -114,9 +123,6 @@ function Canvas({
               draw.drawLineTo(point);
               draw.setting(prevSetting);
             }
-            break;
-          case DrawActionType.CLEAR_CANVAS:
-            draw.clearCanvas();
             break;
           case DrawActionType.DRAW_IMAGE:
             {
@@ -171,9 +177,7 @@ function Canvas({
     snapshotCurrentDrawing();
 
     draw.clearCanvas();
-    sendDrawActionToServer(DrawActionType.CLEAR_CANVAS, {
-      newestDrawing: draw.getSnapshot(),
-    });
+    sendDrawActionToServer(DrawActionType.DRAW_IMAGE, draw.getSnapshot());
   }, [draw, snapshotCurrentDrawing]);
 
   const undoDrawing = useCallback(() => {
@@ -182,9 +186,7 @@ function Canvas({
     draw.drawImage(pastDrawing);
     setPastDrawings([...pastDrawings]);
     setFutureDrawings([...futureDrawings, draw.getSnapshot()]);
-    sendDrawActionToServer(DrawActionType.DRAW_IMAGE, pastDrawing, {
-      newestDrawing: pastDrawing,
-    });
+    sendDrawActionToServer(DrawActionType.DRAW_IMAGE, pastDrawing);
   }, [pastDrawings, futureDrawings, draw, setPastDrawings, setFutureDrawings]);
 
   const redoDrawing = useCallback(() => {
@@ -194,9 +196,7 @@ function Canvas({
     draw.drawImage(futureDrawing);
     setPastDrawings([...pastDrawings, draw.getSnapshot()]);
     setFutureDrawings([...futureDrawings]);
-    sendDrawActionToServer(DrawActionType.DRAW_IMAGE, futureDrawing, {
-      newestDrawing: futureDrawing,
-    });
+    sendDrawActionToServer(DrawActionType.DRAW_IMAGE, futureDrawing);
   }, [pastDrawings, futureDrawings, draw, setFutureDrawings, setPastDrawings]);
 
   // event handler
@@ -211,23 +211,18 @@ function Canvas({
     [snapshotCurrentDrawing, startDrawLine],
   );
 
-
   const handleTouchMove = useCallback(
-    (evt: TouchEvent) => {
+    throttle((evt: TouchEvent) => { // 节流
       const p = getPointFromEvent(evt);
       drawLineTo(p);
-    },
+    }, 34), // 最多30帧
     [drawLineTo],
   );
 
   const handleTouchEnd = useCallback(() => {
-    const drawing = draw.getSnapshot();
-    sendDrawActionToServer(DrawActionType.DRAW_IMAGE, draw.getSnapshot(), {
-      newestDrawing: drawing,
-    });
+    // const drawing = draw.getSnapshot();
+    sendDrawActionToServer(DrawActionType.DRAW_IMAGE, draw.getSnapshot());
   }, [draw]);
-
-
 
   const [posDivEl, setPosDivEl] = useState<HTMLDivElement | null>(null);
 

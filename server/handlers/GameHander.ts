@@ -1,7 +1,7 @@
 import { ReservedEventName } from '../../shared/constants';
 import ChattingMessage from '../../shared/models/ChattingMessage';
-import DrawAction from '../models/DrawAction';
 import HandlerContext from '../models/HandlerContext';
+import DrawAction from '../../shared/models/DrawAction';
 
 export default class GameHandler {
   static getGame(ctx: HandlerContext) {
@@ -21,13 +21,13 @@ export default class GameHandler {
     const { user, room, game, req: message } = ctx;
     if (user == null || room == null || game == null) return;
 
-    const { drawAction, newestDrawing } = message.data as {
-      drawAction: DrawAction;
-      newestDrawing?: string;
-    };
-    if (newestDrawing !== undefined) {
-      game.newestDrawing = newestDrawing;
+    const drawAction = message.data as DrawAction;
+
+    if (drawAction.type === DrawAction.Type.DRAW_IMAGE) {
+      game.newestDrawing = drawAction.payload as string;
     }
+
+    if (drawAction.ignore) return;
     room.sendDataToUsersButUser(
       drawAction,
       ReservedEventName.DRAW_ACTION,

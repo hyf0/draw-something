@@ -5,7 +5,6 @@ export interface IUser {
   id: string;
   currentRoomId: number | undefined;
   isGaming: boolean;
-  isDeleted: boolean;
   isOnLine: boolean;
   username: string;
   lastActiveTime: number;
@@ -23,15 +22,6 @@ export interface IRoom {
   playTimes: number;
   gameTime: number;
 }
-
-// users: this.users.map(u => u.toJSON()),
-// playTimes: this.playTimes,
-// gameTime: this.gameTime,
-// newestDrawing: this.newestDrawing,
-// // userDraw: this.userDraw,
-// countScore: this.countScore,
-// currentTimes: this.currentTimes,
-// playInfo: this.playInfo,
 
 export interface IGame {
   users: IUser[],

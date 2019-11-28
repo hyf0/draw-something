@@ -2,7 +2,6 @@ import uuidv4 from 'uuid/v4';
 import NodeWebsocket from 'ws';
 import { EventEmitter } from 'events';
 
-import { ReservedEventName } from '../../shared/constants';
 import { IUser } from '../../shared/types';
 import globals from '../globals';
 import { log } from '../util/helper';
@@ -16,7 +15,6 @@ export default class User extends EventEmitter {
   currentRoomId: undefined | number; // 房间号
   isGaming = false;
   isOnLine = true;
-  isDeleted = false;
   username = DataService.getRandomName();
   isReady = false;
   lastActiveTime = Date.now();
@@ -37,7 +35,6 @@ export default class User extends EventEmitter {
 
   toJSON(): IUser {
     return {
-      isDeleted: this.isDeleted,
       token: this.token,
       id: this.id,
       currentRoomId: this.currentRoomId,
@@ -72,38 +69,12 @@ export default class User extends EventEmitter {
     this.isOnLine = false;
     this.emit('offLine');
     this.timerId.deleteUser = setTimeout(() => {
-      // 不论在干嘛，超时就直接删除
+      // 不论在干嘛，超时就直接删除，通报个 delete 事件，由订阅者决定怎么办
       log(`${this.username} is deleted`);
       globals.sesstionUserMap.delete(this.token);
       globals.userMap.delete(this.token);
-      this.isDeleted = true;
       this.emit('delete');
     }, 60 * 1000); //用户断线重连的时间为1分钟，然后就进行清理
-
-    // const room = globals.roomMap.get(this.currentRoomId || -1);
-    // if (room !== undefined) {
-    //   if (this.isGaming) {
-    //     // 在游戏中时候，断线的逻辑
-    //     const game = globals.gameMap.get(room.id);
-    //     if (game !== undefined) {
-    //       room.sendDataToUsersButUser(game, ReservedEventName.REFRESH_GAME, this, `${this.username} 断线`);
-    //     }
-    //   }
-
-    //   // 在房间里的时候，断线的逻辑
-    //   const roomUsers = room.users;
-    //   const isMeTheHost = roomUsers.length > 0 && roomUsers[0].id === this.id;
-    //   const removeSelfInRoom = () => {
-    //     room.removePlayerInRoom(this);
-    //     room.sendDataToUsers(room, ReservedEventName.REFRESH_ROOM);
-    //   }
-    //   if (isMeTheHost) {
-    //     // 房主的退出会有一个延迟，避免房主刷新下，就自动转交房主了
-    //   } else removeSelfInRoom(); // 不是房主的情况下会立即退出
-    // }
-
-    // todo 游戏时，用户断线怎么办
-
 
   };
 

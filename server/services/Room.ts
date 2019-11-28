@@ -5,7 +5,7 @@ import { RoomStatus, RoomType } from '../../shared/constants/room';
 import ChattingMessage from '../../shared/models/ChattingMessage';
 import ResponseMessage from '../../shared/models/ResponseMessage';
 import { IRoom, IUser } from '../../shared/types';
-import globals from '../globals';
+import { TGlobals } from '../globals';
 import { createIncreaseIdGetter } from '../util/helper';
 import SenderService from './SenderService';
 import User from './User';
@@ -16,7 +16,8 @@ export default class Room extends EventEmitter {
   public name: string;
   public type: RoomType;
   public id = getNextRoomId();
-  public userIdSet = new Set<string>(); // 存储user id
+  // public userIdSet = new Set<string>(); // 存储user id
+  public userMap = new Map<string, User>();
   public status: RoomStatus = RoomStatus.WAITING;
   public maxUserNumber = 8;
   public createAt = Date.now();
@@ -24,23 +25,10 @@ export default class Room extends EventEmitter {
   public gameTime = 60; // 每一场，单位s
 
   get users() {
-    const userIds = [...this.userIdSet.keys()];
-    const users = userIds.map(uid => {
-      const user = globals.userMap.get(uid);
-      if (user === undefined)
-        throw new Error(`users 错误，未找到 ${uid} 对应的用户`);
-      return user;
-    });
+    const users = [...this.userMap.values()];
     return users;
   }
 
-  get userNumber() {
-    return this.userIdSet.size;
-  }
-
-  get isFulled() {
-    return this.userNumber === this.maxUserNumber;
-  }
 
   private constructor(
     args: {
@@ -59,57 +47,33 @@ export default class Room extends EventEmitter {
       type: RoomType;
     }
   ) {
-    const created = new Room(args);
-    globals.roomMap.set(created.id, created);
-    const eventsName = ['addUser', 'removeUser'];
-    eventsName.forEach(evtName => {
-      created.on(evtName, Room.refreshRoomList);
-    });
-    created.once('delete', () => {
-      eventsName.forEach(evtName => {
-        created.off(evtName, Room.refreshRoomList);
-      });
-    });
-    return created;
+    return new Room(args);;
   }
 
   has(user: IUser) {
-    return this.userIdSet.has(user.id);
+    return this.userMap.has(user.id);
   }
 
   addUser(user: User) {
-    if (this.isFulled) {
+    if (this.maxUserNumber === this.userMap.size) {
       throw new Error('房间人数已满');
     } else if (this.status === RoomStatus.GAMING) {
       throw new Error('房间正在游戏中');
     } else {
-      this.userIdSet.add(user.id);
+      if (this.has(user)) return;
+      this.userMap.set(user.id, user);
       user.currentRoomId = this.id;
-
-      const removeUserWhenDeleted = () => {
-        user.off('reuse', cancelRemoveWhenReused);
-        if (this.has(user)) this.removeUser(user);
-      }
-      const cancelRemoveWhenReused = () => {
-        user.off('delete', removeUserWhenDeleted);
-      }
-      // 一个竞态，谁先触发，就删除对方
-      user.once('reuse', cancelRemoveWhenReused); // 当 user 被删除的时候，退出房间
-      user.once('delete', removeUserWhenDeleted); // 当 user 重连时 取消删除
       this.emit('addUser');
     }
-    // const room
   }
 
-  removeUser(user: User) {
-    if (this.status === RoomStatus.WAITING) {
+  removeUser(user: User, force = false) {
+    if (!this.has(user)) return;
+    if (force || this.status === RoomStatus.WAITING) {
       user.currentRoomId = undefined;
       user.isReady = false;
-      this.userIdSet.delete(user.id);
-      if (this.userNumber === 0) {
-        globals.roomMap.delete(this.id);
-        this.emit('delete');
-      }
+      this.userMap.delete(user.id);
+      if (this.userMap.size === 0) this.emit('delete');
       this.emit('removeUser');
     }
   }
@@ -127,14 +91,13 @@ export default class Room extends EventEmitter {
   }
 
   sendDataToUsers(data: any, trigger: string, desc?: string) {
-    const room = globals.roomMap.get(this.id);
-    if (room == undefined) return;
+
     const respMsg = new ResponseMessage({
       data,
       trigger,
       desc: desc || 'sendMessageToUsers',
     });
-    room.users.forEach(u => {
+    this.users.forEach(u => {
       SenderService.send(u.ws, respMsg);
     });
   }
@@ -145,14 +108,12 @@ export default class Room extends EventEmitter {
     butUser: User,
     desc?: string,
   ) {
-    const room = globals.roomMap.get(this.id);
-    if (room == undefined) return;
     const respMsg = new ResponseMessage({
       data,
       trigger,
       desc: desc || 'sendMessageToUsers',
     });
-    room.users.forEach(u => {
+    this.users.forEach(u => {
       if (u.id !== butUser.id) SenderService.send(u.ws, respMsg);
     });
   }
@@ -171,13 +132,12 @@ export default class Room extends EventEmitter {
     };
   }
 
-  static refreshRoomList() {
+  static refreshRoomList(globals: TGlobals) {
     const roomList = [...globals.roomMap.values()];
     const users = [...globals.userMap.values()];
     const filtedRoomList = roomList.filter(
       room =>
         room.status === RoomStatus.WAITING && // 不在游戏中
-        !room.isFulled && // 没有满
         room.type === RoomType.PUBLIC, // 非私人房间
     );
     users.forEach(u => {

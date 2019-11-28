@@ -24,6 +24,7 @@ export default class Connection {
 
   handlerMessage(rawMessage: NodeWebsocket.Data) {
     const reqMsg = parseRawMessage(rawMessage);
+
     if (IS_DEV_SERVER) {
       log(`reqeust ${reqMsg.handler}-${reqMsg.id}`, JSON.stringify(reqMsg.data, null, 2));
     }

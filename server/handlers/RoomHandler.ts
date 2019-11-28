@@ -1,4 +1,3 @@
-import { ReservedEventName } from '../../shared/constants';
 import { RoomStatus, RoomType } from '../../shared/constants/room';
 import ChattingMessage from '../../shared/models/ChattingMessage';
 import HandlerContext from '../models/HandlerContext';
@@ -12,7 +11,21 @@ export default class RoomHandler {
       type: RoomType;
     };
     const room = Room.create({ name, type });
-    Room.refreshRoomList();
+    ctx.globals.roomMap.set(room.id, room);
+    const refreshRoomList = () => Room.refreshRoomList(ctx.globals);
+    room.on('addUser', refreshRoomList)
+    room.on('removeUser', refreshRoomList)
+    room.on('addUser', room.refreshRoomOfUsers);
+    room.on('removeUser', room.refreshRoomOfUsers)
+    room.once('delete', () => {
+      room.off('addUser', refreshRoomList)
+      room.off('removeUser', refreshRoomList)
+      room.off('addUser', room.refreshRoomOfUsers);
+      room.off('removeUser', room.refreshRoomOfUsers)
+      ctx.globals.roomMap.delete(room.id);
+      refreshRoomList()
+    });
+    refreshRoomList();
     ctx.sendRespData(room);
   }
 
@@ -30,8 +43,10 @@ export default class RoomHandler {
     try {
       room.addUser(user);
       ctx.sendRespData({ room, user });
-      room.refreshRoomOfUsers(user); // 针对房间里其他人,刷新房间信息
       room.sendChatting(new ChattingMessage(`${user.username} 进入了游戏`));
+      user.once('delete', () => {
+        if (room.has(user)) room.removeUser(user, true);
+      });
     } catch (err) {
       ctx.sendRespError(err.message);
     }
@@ -42,8 +57,6 @@ export default class RoomHandler {
     if (room == undefined || user == undefined) return;
 
     room.removeUser(user);
-    room.refreshRoomOfUsers(); // 针对房间里其他人,刷新房间信息
-
     room.sendChatting(new ChattingMessage(`${user.username} 离开了游戏`));
   }
 
@@ -67,7 +80,6 @@ export default class RoomHandler {
     const filtedRoomList = roomList.filter(
       room =>
         room.status === RoomStatus.WAITING && // 不在游戏中
-        !room.isFulled && // 没有满
         room.type === RoomType.PUBLIC, // 非私人房间)
     );
     ctx.sendRespData(filtedRoomList);
@@ -76,17 +88,22 @@ export default class RoomHandler {
   static startGameIfAllPlayerIsReady(ctx: HandlerContext) {
     const { room, user } = ctx;
     if (room == undefined || user == undefined) return;
-    const usersOfRoom = room.users;
-    const readyUsers = usersOfRoom.filter(u => u.isReady);
-    if (usersOfRoom.length > 1 && usersOfRoom.length === readyUsers.length) {
-      usersOfRoom.forEach(u => (u.isGaming = true));
+    const roomUsers = room.users;
+    const readyUsers = roomUsers.filter(u => u.isReady);
+    const isAllReady = roomUsers.length > 1 && roomUsers.length === readyUsers.length;
+    if (isAllReady) {
       const game = Game.create(room);
-      room.status = RoomStatus.GAMING;
-      usersOfRoom.forEach(u => (u.isReady = false)); // 重置user.isReady状态
-
-      room.sendDataToUsers({ user, game }, ReservedEventName.START_GAME);
-
-      Room.refreshRoomList(); // 房间信息变化，刷新房间列表
+      game.start();
+      room.users.forEach(rUser => {
+        rUser.on('reuse', game.refreshGameUsers);
+        rUser.on('offLine', game.refreshGameUsers);
+      });
+      game.once('delete', () => {
+        roomUsers.forEach(rUser => {
+          rUser.off('reuse', game.refreshGameUsers);
+          rUser.off('offLine', game.refreshGameUsers);
+        });
+      });
     }
   }
 

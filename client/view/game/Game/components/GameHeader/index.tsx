@@ -2,7 +2,7 @@ import './index.scss';
 
 import wsClient from '@client/WebsocketClient/wsClient';
 import { AppBar } from '@material-ui/core';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { ReservedEventName } from '../../../../../../shared/constants';
 import { IGame } from '../../../../../../shared/types';
@@ -26,6 +26,8 @@ function GameHeader({
     };
   }, [setGameTimeSoFar]);
 
+  const { playInfo } = currentGame;
+
   return (
     <AppBar
       style={{
@@ -36,8 +38,8 @@ function GameHeader({
       <div className="game-header">
         <span className="game-header-hint">
           {isSelfPlaying
-            ? `请画 ${currentGame.playInfo.keyword.raw}`
-            : `${currentGame.playInfo.keyword.raw.length}个字 ${currentGame.playInfo.keyword.hint}`}
+            ? `请画 ${playInfo.keyword.raw}`
+            : `${playInfo.keyword.raw.length}个字 ${playInfo.keyword.hint}`}
         </span>
         <span className="game-time-so-far">剩余:{gameTimeSoFar}秒</span>
       </div>

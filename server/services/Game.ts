@@ -4,7 +4,7 @@ import { ReservedEventName } from '../../shared/constants';
 import { RoomStatus } from '../../shared/constants/room';
 import ChattingMessage from '../../shared/models/ChattingMessage';
 import ResponseMessage from '../../shared/models/ResponseMessage';
-import { IGame } from '../../shared/types';
+import { IGame, IUser } from '../../shared/types';
 import globals from '../globals';
 import { logError } from '../util/helper';
 import DataService from './DataService';
@@ -36,11 +36,15 @@ export default class Game extends EventEmitter {
   scoreForNextGuessRight = 4; // 第一个猜对的人4分，依次递减，最低1分
   numOfRightGuesser = 0;
   isOverTime = false;
-  playInfo = {
-    keyword: createKeyword(DataService.getRandomGameKeyword()),
-    drawer: this.users[0],
-    time: this.room.gameTime,
-  };
+  users: User[];
+  playInfo: {
+    keyword: {
+      raw: string;
+      hint: string;
+    },
+    drawer: User,
+    time: number;
+  }
 
   // 每一次play和每一轮都会更改的
 
@@ -49,14 +53,12 @@ export default class Game extends EventEmitter {
   gameTime: number; // 每一场的游戏时间
   scoreForCurrentDrawer = 2; // 每次有人才对，绘画者加2分
 
-  get users() {
-    return this.room.users;
-  }
 
   get isGameOver() {
     return this.rounds < 0; // rounds 表示的还剩多少轮，等于0表示没有下一轮了，但不表示游戏已经结束
   }
-  get isPlayOver() { // 除了画家的玩家
+  get isPlayOver() {
+    // 除了画家的玩家
 
     const users = this.users;
     return this.numOfRightGuesser >= users.length - 1;
@@ -65,45 +67,60 @@ export default class Game extends EventEmitter {
   static create(room: Room) {
     const aGame = new Game(room);
     globals.gameMap.set(room.id, aGame);
-    const users = room.users;
-    users.forEach(u => {
-      u.on('offLine', () => aGame.refreshGameUsers('offLine'));
-      u.on('reuse', () => aGame.refreshGameUsers('reuse'));
-    });
-    aGame.once('delete', () => {
-      users.forEach(u => {
-        u.off('offLine', aGame.refreshGameUsers);
-        u.off('reuse', aGame.refreshGameUsers);
-      });
-    });
-
     return aGame;
   }
 
   private constructor(private room: Room) {
     super();
-    this.rounds = room.rounds;
+    this.users = room.users;
     this.gameTime = room.gameTime;
+    this.playInfo = {
+      keyword: createKeyword(DataService.getRandomGameKeyword()),
+      drawer: this.users[0],
+      time: this.room.gameTime,
+    };
+    this.rounds = room.rounds;
     room.users.forEach(u => {
       this.userScores[u.id] = 0;
     });
     this.startNextRound(true);
   }
 
-  refreshGameUsers = (desc?: string) => {
-    this.room.sendDataToUsers(this.users, ReservedEventName.REFRESH_GAME_USERS, desc);
+  start() {
+    this.room.status = RoomStatus.GAMING;
+    const roomUsers = this.room.users;
+    roomUsers.forEach(user => {
+      user.isGaming = true;
+      user.isReady = false;
+      this.room.sendDataToUsers(
+        { user, game: this },
+        ReservedEventName.START_GAME,
+      );
+    });
   }
 
+  refreshGameUsers = (desc?: string) => {
+    this.room.sendDataToUsers(
+      this.users,
+      ReservedEventName.REFRESH_GAME_USERS,
+      desc,
+    );
+  };
+
   sendPlayOver() {
-    this.room.sendDataToUsers({
-      answer: this.playInfo.keyword.raw,
-    }, ReservedEventName.PLAY_OVER);
+    this.room.sendDataToUsers(
+      {
+        answer: this.playInfo.keyword.raw,
+      },
+      ReservedEventName.PLAY_OVER,
+    );
   }
 
   gameOver() {
+    this.emit('delete');
     globals.gameMap.delete(this.room.id);
     this.room.status = RoomStatus.WAITING;
-    this.users.forEach(u => {
+    this.room.users.forEach(u => {
       u.isGaming = false;
       SenderService.send(
         u.ws,
@@ -115,7 +132,8 @@ export default class Game extends EventEmitter {
     });
   }
 
-  findNextDrawer() { // 如果返回 undefined，则说说明一轮过去了
+  findNextDrawer() {
+    // 如果返回 undefined，则说说明一轮过去了
     const users = this.users;
     if (this.nextGuesserIndex >= users.length) {
       return undefined;
@@ -134,9 +152,7 @@ export default class Game extends EventEmitter {
     if (rightAnswer === guessAnswer) {
       // 分数相关
       this.userScores[guesser.id] += this.scoreForNextGuessRight;
-      this.userScores[
-        this.playInfo.drawer.id
-      ] += this.scoreForCurrentDrawer;
+      this.userScores[this.playInfo.drawer.id] += this.scoreForCurrentDrawer;
       this.room.sendDataToUsers(this, ReservedEventName.REFRESH_GAME);
       this.sendChatting(
         new ChattingMessage(
@@ -152,7 +168,10 @@ export default class Game extends EventEmitter {
       }
 
       // 收尾
-      this.scoreForNextGuessRight = Math.max(1, this.scoreForNextGuessRight - 1); // 保证scoreForNextGuessRight最小值为 1
+      this.scoreForNextGuessRight = Math.max(
+        1,
+        this.scoreForNextGuessRight - 1,
+      ); // 保证scoreForNextGuessRight最小值为 1
 
       return true;
     }
@@ -176,14 +195,20 @@ export default class Game extends EventEmitter {
     if (this.playTimeCountDownTimerId !== undefined) {
       clearTimeout(this.playTimeCountDownTimerId);
     }
-    this.playTimeCountDownTimerId = setTimeout(this.countDownPlayTime.bind(this), 1000);
+    this.playTimeCountDownTimerId = setTimeout(
+      this.countDownPlayTime.bind(this),
+      1000,
+    );
   }
   countDownPlayTime() {
     let oldTime = this.playInfo.time;
     if (oldTime > 0) {
       this.playInfo.time -= 1;
       this.room.sendDataToUsers(this.playInfo.time, ReservedEventName.TIMEOUT);
-      this.playTimeCountDownTimerId = setTimeout(this.countDownPlayTime.bind(this), 1000);
+      this.playTimeCountDownTimerId = setTimeout(
+        this.countDownPlayTime.bind(this),
+        1000,
+      );
     } else {
       this.sendPlayOver();
       this.startNextPlay(9000);
@@ -201,7 +226,8 @@ export default class Game extends EventEmitter {
         const nextDrawer = this.findNextDrawer();
         if (nextDrawer === undefined) {
           this.startNextRound();
-        } else { // 这一轮还没结束, 开始新的一场，刷新信息
+        } else {
+          // 这一轮还没结束, 开始新的一场，刷新信息
           this.numOfRightGuesser = 0;
           this.newestDrawing = undefined;
           this.playInfo = {
@@ -210,7 +236,9 @@ export default class Game extends EventEmitter {
             time: this.room.gameTime,
           };
           this.sendChatting(
-            new ChattingMessage(`本场结束，接下来由${nextDrawer.username}作画了`),
+            new ChattingMessage(
+              `本场结束，接下来由${nextDrawer.username}作画了`,
+            ),
           );
           this.room.sendDataToUsers(
             { game: this },
