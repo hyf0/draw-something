@@ -44,6 +44,8 @@ export default class RoomHandler {
       room.addUser(user);
       ctx.sendRespData({ room, user });
       room.sendChatting(new ChattingMessage(`${user.username} 进入了游戏`));
+      user.on('offLine', room.refreshRoomOfUsers);
+      user.on('reuse', room.refreshRoomOfUsers);
       user.once('delete', () => {
         if (room.has(user)) room.removeUser(user, true);
       });
@@ -56,6 +58,8 @@ export default class RoomHandler {
     const { room, user } = ctx;
     if (room == undefined || user == undefined) return;
 
+    user.off('offLine', room.refreshRoomOfUsers);
+    user.off('reuse', room.refreshRoomOfUsers);
     room.removeUser(user);
     room.sendChatting(new ChattingMessage(`${user.username} 离开了游戏`));
   }
@@ -93,12 +97,14 @@ export default class RoomHandler {
     const isAllReady = roomUsers.length > 1 && roomUsers.length === readyUsers.length;
     if (isAllReady) {
       const game = Game.create(room);
+      ctx.globals.gameMap.set(room.id, game);
       game.start();
       room.users.forEach(rUser => {
         rUser.on('reuse', game.refreshGameUsers);
         rUser.on('offLine', game.refreshGameUsers);
       });
       game.once('delete', () => {
+        ctx.globals.gameMap.delete(room.id);
         roomUsers.forEach(rUser => {
           rUser.off('reuse', game.refreshGameUsers);
           rUser.off('offLine', game.refreshGameUsers);

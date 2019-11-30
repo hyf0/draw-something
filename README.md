@@ -2,7 +2,7 @@
 
 你画我猜(draw something)是一个全端采用 TypeScript 编写的游戏程序，前端使用 React 实现, Websocket 作为前后端通信的手段。
 
-应用地址：[http://iheyunfei.github.io/monica/](http://iheyunfei.com/draw-something/)
+应用演示：[http://iheyunfei.com/draw-something/](http://iheyunfei.com/draw-something/)
 
 ## 技术栈
 
@@ -11,21 +11,6 @@
 - Material-UI
 - NodeJS、Websocket
 
-<!-- ## 特点
-
-- 使用 LocalStorage 保存了用户的作画，玩家可以查看自己的历史画作
-- 基于 Websocket 实现了游戏作画轨迹同步，数据保存、恢复
-- 全端使用 TypeScript 开发，共同管理，从而使得前后端可以复用部分代码，保证了代码类型的正确性
-- 使用 react-router-dom 实现了带有权限控制的路由
-- 依赖于权限控制，根据玩家的状态设置不同的权限，会自动跳转到相应的路由，且无法强制离开
-- 对 Canvas API 进行了封装，实现了在 Canvas 作画时的轨迹同步，数据恢复，保存等功能
-- 对 WebSocket API 进行了封装，规范、同一了前端的请求入口，集中处理请求错误
-- 后端使用 TypeScript 编写，NodeJS 运行，基于 WebSocket 完成了游戏服务器的实现
-- 基于 WebSocket 封装了一个后端框架，根据定义好的请求类型，分发给不同的 handler 函数处理
-- 通过为用户生成不同的 token，会定时清理断线的用户，同时支持在规定时间内重连恢复的功能 -->
-
-
-
 # Todo
 
 \* 表示正在做
@@ -33,16 +18,19 @@
 - [x] 核心功能，正常使用
 - [x] 断线重连，游戏状态恢复
 - [x] 房间聊天室
+- [ ] 对题目进行分类，创建房间时候可选择特定类别的题目
 - [ ] 注册、登录
 
 ## 前端
 
 - [x] 用户状态(是否离线，多少分，谁是房主，该谁画画了)标识
 - [x] 对高频率操作，使用节流函数进行优化
+- [ ] 根据手机屏幕大小智能缩放 Canvas 画布，同时保证每个人看到的画布都是完整的
+- [ ] 使用 Suspense, Webpack Prefetch 进行代码分割，懒加载应用
 - [ ] \*作画时，禁止浏览器下拉刷新
 - [ ] \*完成全局提示，并根据 type 不同，应用不同的样式
 - [ ] 保存画作到 LocalStorage，并可以查看历史画作
-- [ ] 猜对答案时，增加分数结算界面
+- [ ] 每一场游戏结束时，增加分数结算界面
 - [ ] 游戏时，评论的展示方式为弹幕飞过
 
 ## 后端
@@ -63,9 +51,7 @@
 
 后端在用户上下线会刷新整个游戏信息，导致前端重新渲染
 
-- [x] 玩家 drawer 正在画的时候，如果 guesser 刷新页面，大概率无法拿到最新的游戏画面
-
-现在在某次画画行为结束的时候，会进行一次同步画面，用户依旧无法再画家正在画的时候拿到最新画面，保证这点的
+- [x] 玩家 drawer 正在画的时候，如果 guesser 刷新页面，大概率无法拿到最新的游戏画面 [issu#1](https://github.com/iheyunfei/draw-something/issues/1)
 
 - [ ] 在切换玩家 drawer 时，有个1-2s的加载画面，可能有网络和程序两方面的原因
 

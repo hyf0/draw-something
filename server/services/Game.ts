@@ -4,9 +4,8 @@ import { ReservedEventName } from '../../shared/constants';
 import { RoomStatus } from '../../shared/constants/room';
 import ChattingMessage from '../../shared/models/ChattingMessage';
 import ResponseMessage from '../../shared/models/ResponseMessage';
-import { IGame, IUser } from '../../shared/types';
-import globals from '../globals';
-import { logError } from '../util/helper';
+import { IGame } from '../../shared/types';
+
 import DataService from './DataService';
 import Room from './Room';
 import SenderService from './SenderService';
@@ -41,54 +40,40 @@ export default class Game extends EventEmitter {
     keyword: {
       raw: string;
       hint: string;
-    },
-    drawer: User,
+    };
+    drawer: User;
     time: number;
-  }
+  };
 
   // 每一次play和每一轮都会更改的
 
-  nextGuesserIndex = 0;
+  nextGuesserIndex = 1; // 这里是1，是因为开始游戏已经算一场play了
 
-  gameTime: number; // 每一场的游戏时间
   scoreForCurrentDrawer = 2; // 每次有人才对，绘画者加2分
 
-
-  get isGameOver() {
-    return this.rounds < 0; // rounds 表示的还剩多少轮，等于0表示没有下一轮了，但不表示游戏已经结束
-  }
-  get isPlayOver() {
-    // 除了画家的玩家
-
-    const users = this.users;
-    return this.numOfRightGuesser >= users.length - 1;
-  }
-
   static create(room: Room) {
-    const aGame = new Game(room);
-    globals.gameMap.set(room.id, aGame);
-    return aGame;
+    return new Game(room);
   }
 
   private constructor(private room: Room) {
     super();
     this.users = room.users;
-    this.gameTime = room.gameTime;
     this.playInfo = {
       keyword: createKeyword(DataService.getRandomGameKeyword()),
       drawer: this.users[0],
       time: this.room.gameTime,
     };
-    this.rounds = room.rounds;
+    this.rounds = Math.max(room.rounds, 1); // 最少一轮
     room.users.forEach(u => {
       this.userScores[u.id] = 0;
     });
-    this.startNextRound(true);
   }
 
   start() {
     this.room.status = RoomStatus.GAMING;
     const roomUsers = this.room.users;
+    this.startCountDownPlayTime();
+
     roomUsers.forEach(user => {
       user.isGaming = true;
       user.isReady = false;
@@ -99,26 +84,98 @@ export default class Game extends EventEmitter {
     });
   }
 
-  refreshGameUsers = (desc?: string) => {
+
+  tryStartNextPlay(timeout?: number) {
+    const mainLogic = () => {
+      const users = this.users;
+      const isThisRoundOver = this.nextGuesserIndex === users.length;
+      if (isThisRoundOver) {
+        this.rounds -= 1;
+        if (this.rounds === 0) {
+          this.sendGameOver();
+          return; // 游戏结束，直接断掉
+        }
+        // 更新每一轮round相关的变量
+        this.nextGuesserIndex = 0;
+      }
+      // 更新每一场play相关的变量
+      const nextDrawer = users[this.nextGuesserIndex];
+      this.nextGuesserIndex += 1;
+      this.numOfRightGuesser = 0;
+      this.scoreForNextGuessRight = 4;
+      this.newestDrawing = undefined;
+      this.playInfo = {
+        keyword: createKeyword(DataService.getRandomGameKeyword()),
+        drawer: nextDrawer,
+        time: this.room.gameTime,
+      };
+      this.room.sendDataToUsers({ game: this }, ReservedEventName.CHANGE_DRAWER);
+      this.sendChatting(
+        new ChattingMessage(
+          `现在由 ${nextDrawer.username} 作画`,
+        ),
+      );
+      this.startCountDownPlayTime();
+    };
+    if (timeout === undefined) mainLogic();
+    else setTimeout(mainLogic, timeout);
+  }
+
+  countScore(rightGuesser: User) {
+    const { drawer } = this.playInfo;
+    this.userScores[rightGuesser.id] += this.scoreForNextGuessRight;
+    this.userScores[drawer.id] += this.scoreForCurrentDrawer;
+    this.sendChatting(
+      new ChattingMessage(
+        `${rightGuesser.username} 猜对了, 加${this.scoreForNextGuessRight}分`,
+      ),
+    );
+    this.room.sendDataToUsers({ game: this }, ReservedEventName.REFRESH_GAME); // 更新分数
+    this.scoreForNextGuessRight = Math.max(
+      1,
+      this.scoreForNextGuessRight - 1,
+    ); // 保证scoreForNextGuessRight最小值为 1
+  }
+
+  takeGuess(guessAnswer: string, guesser: User) {
+    const rightAnswer = this.playInfo.keyword.raw;
+    if (rightAnswer === guessAnswer) {
+      this.countScore(guesser);
+
+      this.numOfRightGuesser += 1;
+      const isAllGuessRight = this.numOfRightGuesser === this.users.length - 1;
+      if (isAllGuessRight) {
+        this.sendPlayOver();
+        this.stopCountDownPlayTime();
+        this.tryStartNextPlay(8000);
+      }
+    } else {
+      this.sendChatting(
+        new ChattingMessage(guessAnswer, {
+          name: guesser.username,
+          id: guesser.id,
+        }),
+      );
+    }
+  }
+
+  refreshGameUsers = () => {
     this.room.sendDataToUsers(
       this.users,
       ReservedEventName.REFRESH_GAME_USERS,
-      desc,
     );
   };
 
   sendPlayOver() {
+    this.stopCountDownPlayTime();
     this.room.sendDataToUsers(
-      {
-        answer: this.playInfo.keyword.raw,
-      },
+      { answer: this.playInfo.keyword.raw },
       ReservedEventName.PLAY_OVER,
     );
   }
 
-  gameOver() {
+  sendGameOver() {
     this.emit('delete');
-    globals.gameMap.delete(this.room.id);
     this.room.status = RoomStatus.WAITING;
     this.room.users.forEach(u => {
       u.isGaming = false;
@@ -132,63 +189,11 @@ export default class Game extends EventEmitter {
     });
   }
 
-  findNextDrawer() {
-    // 如果返回 undefined，则说说明一轮过去了
-    const users = this.users;
-    if (this.nextGuesserIndex >= users.length) {
-      return undefined;
-    }
-    const guesser = users[this.nextGuesserIndex];
-    this.nextGuesserIndex += 1;
-    return guesser;
-  }
 
   sendChatting(chat: ChattingMessage) {
     this.room.sendDataToUsers(chat, ReservedEventName.GAME_CHATTING);
   }
 
-  takeGuess(guessAnswer: string, guesser: User) {
-    const rightAnswer = this.playInfo.keyword.raw;
-    if (rightAnswer === guessAnswer) {
-      // 分数相关
-      this.userScores[guesser.id] += this.scoreForNextGuessRight;
-      this.userScores[this.playInfo.drawer.id] += this.scoreForCurrentDrawer;
-      this.room.sendDataToUsers(this, ReservedEventName.REFRESH_GAME);
-      this.sendChatting(
-        new ChattingMessage(
-          `${guesser.username} 猜对了, 加${this.scoreForNextGuessRight}分`,
-        ),
-      );
-
-      this.numOfRightGuesser += 1;
-      if (this.isPlayOver) {
-        this.sendPlayOver();
-        this.stopCountDownPlayTime();
-        this.startNextPlay(9000); // 给前端留出分数结算时间
-      }
-
-      // 收尾
-      this.scoreForNextGuessRight = Math.max(
-        1,
-        this.scoreForNextGuessRight - 1,
-      ); // 保证scoreForNextGuessRight最小值为 1
-
-      return true;
-    }
-    return false;
-  }
-
-  private startNextRound(isImmediate: boolean = false) {
-    this.rounds -= 1;
-    if (this.rounds < 0) {
-      this.gameOver();
-      return;
-    }
-
-    this.nextGuesserIndex = 0;
-
-    this.startNextPlay(isImmediate ? undefined : 9000);
-  }
 
   playTimeCountDownTimerId: undefined | NodeJS.Timeout;
   startCountDownPlayTime() {
@@ -211,7 +216,7 @@ export default class Game extends EventEmitter {
       );
     } else {
       this.sendPlayOver();
-      this.startNextPlay(9000);
+      this.tryStartNextPlay(8000);
     }
   }
   stopCountDownPlayTime() {
@@ -220,48 +225,11 @@ export default class Game extends EventEmitter {
     }
   }
 
-  startNextPlay(waitFor?: number) {
-    const mainLogic = () => {
-      try {
-        const nextDrawer = this.findNextDrawer();
-        if (nextDrawer === undefined) {
-          this.startNextRound();
-        } else {
-          // 这一轮还没结束, 开始新的一场，刷新信息
-          this.numOfRightGuesser = 0;
-          this.newestDrawing = undefined;
-          this.playInfo = {
-            keyword: createKeyword(DataService.getRandomGameKeyword()),
-            drawer: nextDrawer,
-            time: this.room.gameTime,
-          };
-          this.sendChatting(
-            new ChattingMessage(
-              `本场结束，接下来由${nextDrawer.username}作画了`,
-            ),
-          );
-          this.room.sendDataToUsers(
-            { game: this },
-            ReservedEventName.CHANGE_DRAWER,
-          );
-          this.startCountDownPlayTime();
-        }
-      } catch (err) {
-        // 表示全员离线
-        logError(err);
-      }
-    };
-    if (waitFor === undefined) mainLogic();
-    else {
-      setTimeout(mainLogic, waitFor);
-    }
-  }
 
   toJSON(): IGame {
     return {
       userScores: this.userScores,
       users: this.users.map(u => u.toJSON()),
-      gameTime: this.gameTime,
       newestDrawing: this.newestDrawing,
       playInfo: this.playInfo,
     };

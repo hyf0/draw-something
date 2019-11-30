@@ -101,7 +101,7 @@ export default function Game() {
     <>
       <Dialog
         open={isShowPlayOverPanel}
-        onClose={() => setIsShowPlayOverPanel(false)}
+        // onClose={() => setIsShowPlayOverPanel(false)}
       >
         <DialogTitle>
           正确答案是: {gameAnswer}

@@ -25,7 +25,6 @@ export interface IRoom {
 
 export interface IGame {
   users: IUser[],
-  gameTime: number,
   userScores: {
     [userId: string]: number,
   },

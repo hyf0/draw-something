@@ -29,6 +29,9 @@ const UserList = React.memo(function UserList({ users }: { users: IUser[] }) {
                 {user && index === 0 ? (
                   <UserAvatar.AvatarStatus text="房主" />
                 ) : null}
+                {user.isOnLine ? null : (
+                  <UserAvatar.AvatarStatus bgColor="grey" text="已离线" />
+                )}
                 {user.isReady ? (
                   <UserAvatar.AvatarStatus bgColor="green" text="已准备" />
                 ) : null}
@@ -39,11 +42,14 @@ const UserList = React.memo(function UserList({ users }: { users: IUser[] }) {
         }
         return (
           <div key={index} className="user-list-user">
-            <UserAvatar style={{
-              backgroundColor: '#fff',
-              color: '#000',
-            }} avatar="空" />
-              <div className="user-list-item-username">等待加入</div>
+            <UserAvatar
+              style={{
+                backgroundColor: '#fff',
+                color: '#000',
+              }}
+              avatar="空"
+            />
+            <div className="user-list-item-username">等待加入</div>
           </div>
         );
       })}

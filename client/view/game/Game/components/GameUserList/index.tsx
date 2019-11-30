@@ -26,7 +26,7 @@ function GameUserList({
               <UserAvatar.AvatarStatus text="正在绘画" />
             ) : null}
             {gameUser.isOnLine ? null : (
-              <UserAvatar.AvatarStatus bgColor="red" text="已离线" />
+              <UserAvatar.AvatarStatus bgColor="grey" text="已离线" />
             )}
           </UserAvatar>
           <div className="username">{gameUser.username}</div>

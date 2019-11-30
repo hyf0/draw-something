@@ -1,7 +1,6 @@
 import { ReservedEventName } from '../../shared/constants';
-import ChattingMessage from '../../shared/models/ChattingMessage';
-import HandlerContext from '../models/HandlerContext';
 import DrawAction from '../../shared/models/DrawAction';
+import HandlerContext from '../models/HandlerContext';
 
 export default class GameHandler {
   static getGame(ctx: HandlerContext) {
@@ -39,14 +38,6 @@ export default class GameHandler {
     const { user, room, game, req } = ctx;
     if (user == null || room == null || game == null) return;
     const guessedAnswer = req.data as string;
-    const isGuessRight = game.takeGuess(guessedAnswer, user);
-    if (!isGuessRight) {
-      game.sendChatting(
-        new ChattingMessage(guessedAnswer, {
-          name: user.username,
-          id: user.id,
-        }),
-      );
-    }
+    game.takeGuess(guessedAnswer, user);
   }
 }

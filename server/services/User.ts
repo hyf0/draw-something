@@ -30,7 +30,7 @@ export default class User extends EventEmitter {
     super();
     this.bindEvents(ws);
     globals.sesstionUserMap.set(this.token, this);
-    globals.userMap.set(this.id, this);
+    // globals.userMap.set(this.id, this);
   }
 
   toJSON(): IUser {
@@ -72,7 +72,7 @@ export default class User extends EventEmitter {
       // 不论在干嘛，超时就直接删除，通报个 delete 事件，由订阅者决定怎么办
       log(`${this.username} is deleted`);
       globals.sesstionUserMap.delete(this.token);
-      globals.userMap.delete(this.token);
+      // globals.userMap.delete(this.token);
       this.emit('delete');
     }, 60 * 1000); //用户断线重连的时间为1分钟，然后就进行清理
 

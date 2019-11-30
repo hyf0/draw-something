@@ -29,25 +29,14 @@ export default class Room extends EventEmitter {
     return users;
   }
 
-
-  private constructor(
-    args: {
-      name: string;
-      type: RoomType;
-    }
-  ) {
+  private constructor(args: { name: string; type: RoomType }) {
     super();
     this.name = args.name;
     this.type = args.type;
   }
 
-  static create(
-    args: {
-      name: string;
-      type: RoomType;
-    }
-  ) {
-    return new Room(args);;
+  static create(args: { name: string; type: RoomType }) {
+    return new Room(args);
   }
 
   has(user: IUser) {
@@ -86,12 +75,15 @@ export default class Room extends EventEmitter {
     if (exclude == undefined) {
       this.sendDataToUsers(this, ReservedEventName.REFRESH_ROOM);
     } else {
-      this.sendDataToUsersButUser(this, ReservedEventName.REFRESH_ROOM, exclude);
+      this.sendDataToUsersButUser(
+        this,
+        ReservedEventName.REFRESH_ROOM,
+        exclude,
+      );
     }
-  }
+  };
 
   sendDataToUsers(data: any, trigger: string, desc?: string) {
-
     const respMsg = new ResponseMessage({
       data,
       trigger,
@@ -118,7 +110,8 @@ export default class Room extends EventEmitter {
     });
   }
 
-  toJSON(): IRoom { // 重载对象的JSON.stringfy方法，防止暴露不必要，或私密的属性
+  toJSON(): IRoom {
+    // 重载对象的JSON.stringfy方法，防止暴露不必要，或私密的属性
     return {
       name: this.name,
       type: this.type,
@@ -134,11 +127,10 @@ export default class Room extends EventEmitter {
 
   static refreshRoomList(globals: TGlobals) {
     const roomList = [...globals.roomMap.values()];
-    const users = [...globals.userMap.values()];
+    const users = [...globals.sesstionUserMap.values()];
     const filtedRoomList = roomList.filter(
       room =>
-        room.status === RoomStatus.WAITING && // 不在游戏中
-        room.type === RoomType.PUBLIC, // 非私人房间
+        room.status === RoomStatus.WAITING && room.type === RoomType.PUBLIC, // 不在游戏中 // 非私人房间
     );
     users.forEach(u => {
       if (!u.isGaming && u.currentRoomId == undefined) {

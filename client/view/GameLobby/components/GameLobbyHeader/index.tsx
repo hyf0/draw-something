@@ -56,7 +56,7 @@ const GameLobbyHeader = React.memo(function GameLobbyHeader() {
             <SearchIcon />
           </IconButton>
           <div className="game-lobby-header-title">
-            你画我猜-游戏大厅(v0.02)
+            你画我猜-游戏大厅(v0.99)
           </div>
           <IconButton onClick={() => dispatch(push('/create-room'))}>
             <PlusIcon />

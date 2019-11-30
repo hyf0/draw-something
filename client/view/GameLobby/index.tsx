@@ -1,16 +1,19 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import './index.scss';
 
-import { IReduxState } from '@client/store/reducers';
+import { useDocumentTitle } from '@client/hooks';
+import Notification from '@client/model/Notification';
+import { globalActions } from '@client/store/actions';
 import { globalEffects } from '@client/store/effects';
+import { IReduxState } from '@client/store/reducers';
 import FullScreenLoading from '@client/ui/FullScreenLoading';
+import React, { useEffect } from 'react';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 
-import RoomList from './components/RoomList';
 import AccountCard from './components/AccountCard';
 import GameLobbyHeader from './components/GameLobbyHeader';
+import RoomList from './components/RoomList';
 
-import './index.scss';
-import { useDocumentTitle } from '@client/hooks';
+let isTipShowd = false; // 这里
 
 const indexSelector = ({
   global: { numberOfOnlinePlayer },
@@ -28,6 +31,10 @@ export default function GameLobby() {
     shallowEqual,
   );
   const dispatch = useDispatch();
+  if (!isTipShowd) {
+    dispatch(globalActions.createAddNotification(new Notification('本应用暂时不支持鼠标绘画', 'warn')));
+    isTipShowd = true;
+  }
   useEffect(() => {
     dispatch(globalEffects.getNumberOfOnlinePlayer());
   }, [dispatch]);

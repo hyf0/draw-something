@@ -3,7 +3,7 @@ import { deepOrange } from '@material-ui/core/colors'
 
 import './index.scss';
 
-function AvatarStatus({ text, bgColor }: { text: string, bgColor?: 'red' | 'blue' | 'green'}) {
+function AvatarStatus({ text, bgColor }: { text: string, bgColor?: 'red' | 'blue' | 'green' | 'grey'}) {
   return <div style={{
     backgroundColor: bgColor || 'blue',
   }} className="user-avatar-status">{text}</div>;

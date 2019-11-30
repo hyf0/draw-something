@@ -15,12 +15,12 @@ export default class SenderService {
 
   static send(ws: NodeWebsocket, msg: ResponseMessage) {
     if (IS_DEV_SERVER) {
-      // log(
-      //   `sendBack ${msg.trigger ? `${msg.trigger}-` : ''}${
-      //     msg.requestId ? msg.requestId : ''
-      //   }`,
-      //   JSON.stringify(msg, null, 2),
-      // );
+      log(
+        `sendBack ${msg.trigger ? `${msg.trigger}-` : ''}${
+          msg.requestId ? msg.requestId : ''
+        }`,
+        JSON.stringify(msg, null, 2),
+      );
     }
     this.sendResponseMessage(ws, msg);
   }
