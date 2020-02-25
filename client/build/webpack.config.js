@@ -33,7 +33,8 @@ module.exports = env => {
     devServer: isProductionEnv ? undefined : {
       // contentBase: paths.outputPath, // ?
       // compress: true,
-      host: '0.0.0.0',
+      host: '127.0.0.1',
+      open: true,
       port: 3001,
       hot: true,
     },
@@ -60,17 +61,21 @@ module.exports = env => {
     },
     // 插件
     plugins: [
-      new CleanWebpackPlugin(), // 自动清理上一次编译的文件
       new HtmlWebpackPlugin({ // 生成 html
         template: './public/index.html'
       }),
       new ProgressBarPlugin(), // 提供编译进度条
-      new ForkTsCheckerWebpackPlugin(),
+      new ForkTsCheckerWebpackPlugin(), // 提供编译时代码类型检查
       new DefinePlugin({ // 注入变量
         __DEV__: isDevelopmentEnv ? true : false,
       }),
-      isDevelopmentEnv ? new HotModuleReplacementPlugin() : undefined, // 开发模式开启 热重启
-      isProductionEnv ? new BundleAnalyzerPlugin() : undefined, // 生产模式分析代码大小
+      ...(isDevelopmentEnv ? [ // 开发模式下启用的插件
+        new HotModuleReplacementPlugin(), // 热重启
+      ] : []),
+      ...(isProductionEnv ? [ // 生产模式下启用的插件
+        new CleanWebpackPlugin(), // 自动清理上一次编译的文件
+        new BundleAnalyzerPlugin(), // 生产模式分析代码大小
+      ] : []),
     ].filter(Boolean),
     resolve: {
       extensions: [".ts", ".tsx", ".jsx", ".js", ".json"],

@@ -6,10 +6,10 @@ import GameLobby from '@/views/GameLobby';
 import CreateRoom from '@/views/room/CreateRoom';
 import PlayingRoom from '@/views/room/PlayingRoom';
 
-interface IRoute {
+export interface IRoute {
   path: string;
-  component: (...args: any[]) => JSX.Element;
-  layout?: (...args: any[]) => JSX.Element;
+  component?: (...args: any[]) => JSX.Element;
+  lazy?: any;
   children?: IRoute[];
 }
 
