@@ -1,5 +1,5 @@
 import wsClient from "@/WebsocketClient/wsClient";
-import { IUser } from "shared/types";
+import { IUser } from "@/types/service";
 
 export async function login(token?: string) {
   const user = (await wsClient.request('login', token)).data as IUser;

@@ -2,8 +2,8 @@ import Notification from '@/model/Notification';
 import wsClient from '@/WebsocketClient/wsClient';
 import { push, replace } from 'connected-react-router';
 import { batch as batchDispatch } from 'react-redux';
-import { RoomStatus, RoomType } from 'shared/constants/room';
-import { IGame, IRoom, IUser } from 'shared/types';
+import { RoomStatus, RoomType } from '@/types/constants/room';
+import { IGame, IRoom, IUser } from '@/types/service';
 
 import { globalActions, roomActions, userActions } from '../actions';
 import { TReduxThunk } from '../effects';

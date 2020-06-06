@@ -1,10 +1,10 @@
 import { EventEmitter } from 'events';
 
-import { ReservedEventName } from '../../shared/constants';
-import { RoomStatus } from '../../shared/constants/room';
-import ChattingMessage from '../../shared/models/ChattingMessage';
-import ResponseMessage from '../../shared/models/ResponseMessage';
-import { IGame } from '../../shared/types';
+import { ReservedEventName } from '../../../client/src/types/constants';
+import { RoomStatus } from '../../../client/src/types/constants';
+import ChattingMessage from '../../../client/src/types/models/ChattingMessage';
+import ResponseMessage from '../../../client/src/types/models/ResponseMessage';
+import { IGame } from '../../../client/src/types/service';
 
 import DataService from './DataService';
 import Room from './Room';

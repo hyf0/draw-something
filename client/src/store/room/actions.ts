@@ -1,7 +1,7 @@
 import { IAction } from '../actions';
 import { roomActionTypes } from '../actionTypes';
-import { IRoom, IUser, IGame } from 'shared/types';
-import { RoomStatus } from 'shared/constants/room';
+import { IRoom, IUser, IGame } from '@/types/service';
+import { RoomStatus } from '@/types/constants/room';
 
 export function createSetRoomList(roomList: any[]): IAction {
   return {

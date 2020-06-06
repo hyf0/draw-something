@@ -1,7 +1,7 @@
 import { produce } from 'immer';
 
-import { RoomStatus } from 'shared/constants';
-import { IGame, IRoom, IUser } from 'shared/types';
+import { RoomStatus } from '@/types/constants';
+import { IGame, IRoom, IUser } from '@/types/service';
 import { IAction } from '../actions';
 import { roomActionTypes } from '../actionTypes';
 

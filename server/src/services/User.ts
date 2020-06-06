@@ -2,7 +2,7 @@ import uuidv4 from 'uuid/v4';
 import NodeWebsocket from 'ws';
 import { EventEmitter } from 'events';
 
-import { IUser } from '../../shared/types';
+import { IUser } from '../../../client/src/types/service';
 import globals from '../globals';
 import { log } from '../util/helper';
 import DataService from './DataService';

@@ -1,0 +1,27 @@
+.view-room-creator {
+  background-color: #fff;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-flow: column nowrap;
+  .create-room-header {
+    position: relative;
+    .MuiIconButton-root {
+      color: #fff;
+    }
+    .create-room-header-title {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: -1;
+    }
+  }
+  .view-room-creator-main {
+    flex: 1;
+  }
+}

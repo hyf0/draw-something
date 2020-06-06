@@ -1,0 +1,8 @@
+.genneral-layout {
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100%;
+  .genneral-layout-content {
+    flex: 1;
+  }
+}

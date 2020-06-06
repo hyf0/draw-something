@@ -5,15 +5,18 @@ import { IReduxState } from '../store/reducers';
 import FullScreenLoading from '../ui/FullScreenLoading';
 import { userEffects } from '../store/effects';
 
-const selectorAuthLoyout = ({ user: { user }, router: { location: { pathname } } }: IReduxState) => ({
+const selectorAuthLoyout = ({
+  user: { user },
+  router: {
+    location: { pathname },
+  },
+}: IReduxState) => ({
   user,
   pathname,
 });
 
-export default function AuthLoyout({ children}: {children: any}) {
-
+export default function AuthLoyout({ children }: { children: any }) {
   const { user, pathname } = useSelector(selectorAuthLoyout, shallowEqual);
-
 
   const dispatch = useDispatch();
 
@@ -24,7 +27,7 @@ export default function AuthLoyout({ children}: {children: any}) {
     }
 
     if (user.isGaming && user.currentRoomId == null) {
-      console.error('用户正在游戏中', '但找不到房间号');
+      console.error('这一边是个后端错误，用户正在游戏中但找不到房间号');
     }
 
     if (user.isGaming && user.currentRoomId != null) {
@@ -36,7 +39,7 @@ export default function AuthLoyout({ children}: {children: any}) {
     }
   }, [user, pathname, dispatch]);
 
-  if (user == null) return <FullScreenLoading />
+  if (user == null) return <FullScreenLoading />;
 
   return children;
 }

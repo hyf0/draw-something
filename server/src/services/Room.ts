@@ -1,10 +1,10 @@
 import { EventEmitter } from 'events';
 
-import { ReservedEventName } from '../../shared/constants';
-import { RoomStatus, RoomType } from '../../shared/constants/room';
-import ChattingMessage from '../../shared/models/ChattingMessage';
-import ResponseMessage from '../../shared/models/ResponseMessage';
-import { IRoom, IUser } from '../../shared/types';
+import { ReservedEventName } from '../../../client/src/types/constants';
+import { RoomStatus, RoomType } from '../../../client/src/types/constants';
+import ChattingMessage from '../../../client/src/types/models/ChattingMessage';
+import ResponseMessage from '../../../client/src/types/models/ResponseMessage';
+import { IRoom, IUser } from '../../../client/src/types/service';
 import { TGlobals } from '../globals';
 import { createIncreaseIdGetter } from '../util/helper';
 import SenderService from './SenderService';

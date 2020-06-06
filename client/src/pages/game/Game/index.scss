@@ -1,0 +1,11 @@
+.view-game {
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  .view-game-main {
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 1;
+    overflow: hidden;
+  }
+}

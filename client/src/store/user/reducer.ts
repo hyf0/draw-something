@@ -1,4 +1,4 @@
-import { IUser } from 'shared/types';
+import { IUser } from '@/types/service';
 import { produce } from 'immer';
 
 import { IAction } from '../actions';

@@ -1,5 +1,5 @@
-import { RoomStatus, RoomType } from '../../shared/constants/room';
-import ChattingMessage from '../../shared/models/ChattingMessage';
+import { RoomStatus, RoomType } from '../../../client/src/types/constants';
+import ChattingMessage from '../../../client/src/types/models/ChattingMessage';
 import HandlerContext from '../models/HandlerContext';
 import Game from '../services/Game';
 import Room from '../services/Room';

@@ -1,5 +1,5 @@
 import NodeWebsocket from 'ws';
-import RequestMessage from '../../shared/models/RequestMessage';
+import RequestMessage from '../../../client/src/types/models/RequestMessage';
 import { TGlobals } from '../globals';
 import handlers from '../handlers';
 import { parseRawMessage } from '../middleware/parseMessage';

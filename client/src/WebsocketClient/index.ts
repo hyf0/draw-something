@@ -1,5 +1,5 @@
-import ResponseMessage from 'shared/models/ResponseMessage';
-import RequestMessage from 'shared/models/RequestMessage';
+import ResponseMessage from '@/types/models/ResponseMessage';
+import RequestMessage from '@/types/models/RequestMessage';
 import EventEmitter from 'eventemitter3';
 // import RequestMessage from './models/RequestMessage';
 
@@ -15,11 +15,7 @@ export default class WebsocketClient extends EventEmitter {
   ) {
     super();
     this.ws = new window.WebSocket(this.options.addr);
-    this.init();
-    // this.debug();
-  }
 
-  init() {
     // 注册事件
     this.ws.onopen = () => {
       this.isConnected = true;
@@ -34,14 +30,15 @@ export default class WebsocketClient extends EventEmitter {
     this.ws.onmessage = ({ data: rawMessage }) => {
       const respMsg: ResponseMessage = JSON.parse(rawMessage);
       this.trigger('message', respMsg);
-      if (respMsg.requestId != null) {
+      if (respMsg.requestId != null) { // 带着 requestId，说明这个响应是针对某个请求产生的
         this.trigger(respMsg.requestId, respMsg);
       }
-      if (respMsg.trigger != null) {
+      if (respMsg.trigger != null) { // 带着 trigger，说明这个响应是针对某个事件产生的
         this.trigger(respMsg.trigger, respMsg);
       }
     };
     // end 注册事件
+
   }
 
   debug() {

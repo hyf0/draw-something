@@ -1,13 +1,12 @@
-import { AppRoute } from '@/route';
-import configureStore, { history } from '@/store';
+import React, { useEffect } from 'react';
+
+import AppRouter from '@/router';
+import configureStore from '@/store';
 import { userActions } from '@/store/actions';
 import wsClient from '@/WebsocketClient/wsClient';
-import { ConnectedRouter } from 'connected-react-router';
-import React, { useEffect } from 'react';
 import { Provider, useDispatch } from 'react-redux';
-import { IUser } from 'shared/types';
+import { IUser } from '@/types/service';
 
-// import { HashRouter } from 'react-router-dom';
 export const store = configureStore();
 
 function App() {
@@ -16,7 +15,7 @@ function App() {
   useEffect(() => {
     const refreshPlayerInfoOff = wsClient.listen(
       'refreshPlayerInfo',
-      msgData => {
+      (msgData) => {
         const user = msgData as IUser;
         dispatch(userActions.createSetUser(user));
       },
@@ -36,17 +35,15 @@ function App() {
       }
       className="App"
     >
-      <ConnectedRouter history={history}>
-        <AppRoute />
-      </ConnectedRouter>
+      <AppRouter />
     </div>
   );
 }
 
-const AppWrapper = () => (
-  <Provider store={store}>
-    <App />
-  </Provider>
-);
-
-export default AppWrapper;
+export default function Wrapper() {
+  return (
+    <Provider store={store}>
+      <App />
+    </Provider>
+  );
+}

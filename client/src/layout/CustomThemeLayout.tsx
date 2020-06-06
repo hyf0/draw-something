@@ -6,9 +6,9 @@ const theme = createMuiTheme({
   palette: {
     // type: 'dark',
     primary: {
-      light: deepOrange[500],
-      main: deepOrange[500],
-      dark: deepOrange[500],
+      light: '#1890ff',
+      main: '#1890ff',
+      dark: '#1890ff',
     },
   },
 });

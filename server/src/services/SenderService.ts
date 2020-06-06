@@ -1,6 +1,6 @@
 import NodeWebsocket from 'ws';
 
-import ResponseMessage from '../../shared/models/ResponseMessage';
+import ResponseMessage from '../../../client/src/types/models/ResponseMessage';
 import { IS_DEV_SERVER } from '../util/contants';
 import { logError, log } from '../util/helper';
 

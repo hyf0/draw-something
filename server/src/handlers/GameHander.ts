@@ -1,5 +1,5 @@
-import { ReservedEventName } from '../../shared/constants';
-import DrawAction from '../../shared/models/DrawAction';
+import { ReservedEventName } from '../../../client/src/types/constants/';
+import DrawAction from '../../../client/src/types/models/DrawAction';
 import HandlerContext from '../models/HandlerContext';
 
 export default class GameHandler {
