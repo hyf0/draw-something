@@ -16,6 +16,7 @@ export default class WebsocketClient extends EventEmitter {
     super();
     this.ws = new window.WebSocket(this.options.addr);
 
+    this.debug();
     // 注册事件
     this.ws.onopen = () => {
       this.isConnected = true;

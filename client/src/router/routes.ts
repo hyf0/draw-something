@@ -2,9 +2,9 @@ import AuthLoyout from '@/layout/AuthLayout';
 import BasicLayout from '@/layout/BasicLayout';
 import CustomThemeLayout from '@/layout/CustomThemeLayout';
 import GameLobby from '@/pages/GameLobby';
-// import Game from '@/pages/game/Game';
-// import CreateRoom from '@/pages/room/CreateRoom';
-// import PlayingRoom from '@/pages/room/PlayingRoom';
+import Game from '@/pages/game/Game';
+import CreateRoom from '@/pages/room/CreateRoom';
+import PlayingRoom from '@/pages/room/PlayingRoom';
 
 export interface IRoute {
   path: string;
@@ -29,15 +29,15 @@ const routes: IRoute[] = [
             children: [
               {
                 path: '/create-room',
-                component: '/room/CreateRoom',
+                component: CreateRoom,
               },
               {
                 path: '/game/:id',
-                component: '/game/Game',
+                component: Game,
               },
               {
                 path: '/room/:roomId',
-                component: '/room/PlayingRoom',
+                component: PlayingRoom,
               },
               {
                 path: '/',

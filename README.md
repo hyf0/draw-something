@@ -2,7 +2,7 @@
 
 你画我猜(draw something)是一个全端采用 TypeScript 编写的游戏程序，前端使用 React 实现, Websocket 作为前后端通信的手段。
 
-应用演示：[http://iheyunfei.com/draw-something/](http://iheyunfei.com/draw-something/)
+应用演示：[https://iheyunfei.github.io/draw-something/](https://iheyunfei.github.io/draw-something/)
 
 
 2019-12-08
@@ -31,7 +31,7 @@
 - [ ] 切换成rem布局，做移动端适配
 
 - [x] 路由
-- - [ ] 异步加载
+- - [x] 异步加载
 
 - [x] 用户状态(是否离线，多少分，谁是房主，该谁画画了)标识
 - [x] 对高频率操作，使用节流函数进行优化
