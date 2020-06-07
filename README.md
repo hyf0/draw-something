@@ -2,12 +2,8 @@
 
 你画我猜(draw something)是一个全端采用 TypeScript 编写的游戏程序，前端使用 React 实现, Websocket 作为前后端通信的手段。
 
-应用演示：[https://iheyunfei.github.io/draw-something/](https://iheyunfei.github.io/draw-something/)
+[应用演示](http://39.101.200.7:9420/#/)
 
-
-2019-12-08
-
-把前后端又修改回两个包管理，觉得更简洁易懂些
 
 ## 技术栈
 
@@ -81,15 +77,32 @@ npm run dev // 以开发模式启动服务器和前端项目
 
 ## 部署
 
+### 前端
+
+#### 开发模式
+
 ```
 
-1. 修改 server 和 client 文件夹下 config.ts 的中的自己的服务器地址和端口
+1. cd ./client
 
-2. npm run build // 并行编译 server 和 client 端的代码
+2. npm run dev
 
-3. 将前端和后端打包后的文件部署到服务器上
+3. 浏览器自动打开应用页面 127.0.0.1:3001
 
-4. 访问服务器地址
+```
+
+### 后端
+
+注意:你的nodejs版本要求是12@或以上
+
+#### 开发模式
+
+```
+cd ./server
+
+npm run dev
+
+// 此时服务器已经开始监听本地 9421 端口
 
 ```
 
